@@ -18,7 +18,8 @@ export default {
   data () {
     return {
       aplayerOptions: {},
-      api: ''
+      api: '',
+      ap: '' // 播放器句柄
     }
   },
   props: {
@@ -48,7 +49,7 @@ export default {
     * */
     type: {
       default() {
-        return 'playlist';
+        return 'song';
       },
       type: String
     },
@@ -68,7 +69,7 @@ export default {
     * */
     url: {
       default() {
-        return 'https://m801.music.126.net/20200617110842/5e9ed5296bb159e1a843edbd21e3bace/jdymusic/obj/w5zDlMODwrDDiGjCn8Ky/2206074651/b69c/b892/aa33/111f9a854630270aedf1ba30853f3f90.mp3';
+        return 'https://api.i-meto.com/meting/api?server=netease&type=url&id=1441183869&auth=31c3ef95962dfcd49b5b667011901a31dcec861e';
       },
       type: String
     },
@@ -167,7 +168,7 @@ export default {
     * */
     lrcType: {
       default() {
-        return 0;
+        return 3;
       },
       type: Number
     },
@@ -187,7 +188,7 @@ export default {
     * */
     pic: {
       default() {
-        return 'https://p3.music.126.net/FLoKNesjpaotmN-qGj9m_A==/109951164912637120.jpg?param=90y90';
+        return 'https://p3.music.126.net/FLoKNesjpaotmN-qGj9m_A==/109951164912637120.jpg?param=390y390';
       },
       type: String
     },
@@ -196,7 +197,7 @@ export default {
     * */
     listFolded: {
       default() {
-        return false;
+        return true;
       },
       type: Boolean
     },
@@ -266,7 +267,7 @@ export default {
           url: options.url,
           cover: options.cover || options.pic,
           lrc: options.lrc || options.lyric || '',
-          type: options.type || 'auto',
+          type: 'auto',
         }
         // 如果没有设置歌词模式-自动填充歌词模式
         if (!newOption.lrc) {
@@ -279,6 +280,16 @@ export default {
     * 开始播放
     * */
     loadPlayer (data) {
+      data.push(data[0])
+      data.push(data[0])
+      data.push(data[0])
+      data.push(data[0])
+      data.push(data[0])
+      data.push(data[0])
+      data.push(data[0])
+      data.push(data[0])
+      data.push(data[0])
+      data.push(data[0])
       let defaultOption = {
         audio: data,
         mutex: true,
@@ -297,7 +308,29 @@ export default {
       })
       options.container = this.$refs.aplayer
       /* eslint-disable no-new */
-      new APlayer(options)
+      console.log(options)
+      this.ap = new APlayer(options)
+      // 播放
+      this.ap.on('play', () => {
+        this.ap.list.hide()
+        this.$emit('play')
+      });
+      // 暂停
+      this.ap.on('pause', () => {
+        this.$emit('pause')
+      });
+    },
+    /*
+    * 显示关闭歌词
+    * */
+    lrcFlag () {
+      this.ap.lrc.toggle()
+    },
+    /*
+    * 显示关闭歌单
+    * */
+    aplayListFlag () {
+      this.ap.list.toggle()
     }
   },
   mounted() {

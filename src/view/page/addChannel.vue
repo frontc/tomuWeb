@@ -1,15 +1,17 @@
 <template>
 <div class="main">
-  <div class="handle-box">
-    <div class="waves-block">
-      <div class="waves wave-1"></div>
-      <div class="waves wave-2"></div>
-      <div class="waves wave-3"></div>
-    </div>
+  <div
+    class="handle-box animate__animated animate__zoomInUp_center"
+    :class="addClass"
+  >
+    <waves
+      class="waves-block"
+      color="rgba(25,190,107,0.75)"
+    />
     <div class="bg-player-box">
       <div class="logo"><img src="@/assets/image/logo.png"></div>
-      <div class="description">ToMu - 让音乐连接你我</div>
-      <div class="input-channel-id"><Input v-model="channelId" size="large" placeholder="请输入频道ID..." /></div>
+      <div class="description SentyPea">ToMu - 让音乐连接你我</div>
+      <div class="input-channel-id"><Input v-model="channelId" size="large" class="SentyPea" placeholder="请输入频道号" /></div>
       <div class="channel-id-submit">
         <Row>
           <Col span="12">
@@ -19,7 +21,7 @@
               size="large"
               icon="md-add"
               @click="addChannel"
-            >新建频道</Button>
+            ><span class="SentyPea">新建频道</span></Button>
           </Col>
           <Col span="12">
             <Button
@@ -28,11 +30,11 @@
               size="large"
               icon="ios-musical-notes"
               @click="getChannel"
-            >进入频道</Button>
+            ><span class="SentyPea">进入频道</span></Button>
           </Col>
         </Row>
       </div>
-      <div class="copy-right">Copyright @ 2011-2020 MoTu All Rights Reserved.</div>
+      <div class="copy-right SentyPea">Copyright @ 2011-2020 MoTu All Rights Reserved.</div>
     </div>
   </div>
 </div>
@@ -41,34 +43,66 @@
 <script>
 import store2 from 'store2'
 import config from '@/config'
+import waves from '@/components/waves.vue'
+import { mapMutations } from 'vuex';
 
 export default {
   name: 'addChannel',
   data () {
     return {
-      channelId: ''
+      channelId: '',
+      addClass: ''
     }
   },
+  components: {
+    waves
+  },
   methods: {
+    ...mapMutations([
+      'resetSystemInfo'
+    ]),
+    /*
+    * 初始化系统基本设置
+    * */
+    initSystemInfo () {
+      this.resetSystemInfo()
+    },
+    /*
+    * 进入频道
+    * */
     getChannel () {
       if (this.channelId === '') {
         this.$Message.info('请输入频道ID')
       } else {
-        store2.local(config.loginChannelName, true)
-        this.$router.push('/')
+        this.goToHome()
       }
     },
+    /*
+    * 新增频道
+    * */
     addChannel () {
-      store2.local(config.loginChannelName, true)
-      this.$router.push('/')
+      this.goToHome()
+    },
+    /*
+    * 进入播放首页
+    * */
+    goToHome () {
+      store2[config.storageType](config.loginChannelName, true)
+      this.addClass = 'animate__zoomOut_center'
+      setTimeout(() => {
+        this.$router.push(config.homePath)
+      }, 800)
     }
+  },
+  created() {
+    // 初始化系统设置
+    this.initSystemInfo()
   }
 }
 </script>
 
 <style scoped lang="less">
 .main{
-  background: url("~@/assets/image/bg.jpg") center no-repeat;
   background-size: cover;
   align-items:center;
   justify-content:center;
@@ -84,7 +118,7 @@ export default {
       left: 0;
       top: 0;
       z-index: 2;
-      .waves {background: rgba(25,190,107,0.75);}
+      .waves {background: rgba(25,190,107,0.75) !important;}
     }
     .bg-player-box{
       position: absolute;
@@ -121,6 +155,45 @@ export default {
         width: 100%;
         color: #999999;
       }
+      @media only screen and (max-width: 700px) and (min-width:0px) {
+        width: 90%;
+        left: 0%;
+        top: 0;
+        height: auto;
+        position: relative;
+        .channel-id-submit{
+          padding: 0 30px 10px 30px;
+        }
+        .ivu-col{
+          padding: 0 5px !important;
+        }
+        .copy-right{
+          position: relative;
+          left: 0;
+          bottom: 0;
+          padding: 8px;
+        }
+      }
+      @media only screen and (max-width: 400px) and (min-width:0px) {
+        .ivu-col{
+          padding: 5px 0px !important;
+          width: 100% !important;
+        }
+      }
+    }
+    @media only screen and (max-width: 700px) and (min-width:0px) {
+      .waves-block{
+        display: none;
+      }
+    }
+  }
+  @media only screen and (max-width: 700px) and (min-width:0px) {
+    .handle-box{
+      width: 100%;
+      height: 100%;
+      align-items:center;
+      justify-content:center;
+      display:-webkit-flex;
     }
   }
 }

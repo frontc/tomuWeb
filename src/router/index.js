@@ -12,15 +12,26 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: '/',
-    name: 'home',
+    name: 'index',
+    redirect: `/${config.homePath}`,
     meta: {
       title: 'ToMu',
     },
     component: () => import('@/view/index.vue'),
+    children: [
+      {
+        path: `/${config.homePath}`,
+        name: config.homePath,
+        meta: {
+          title: 'ToMu',
+        },
+        component: () => import('@/view/page/home.vue'),
+      }
+    ]
   },
   {
-    path: '/addChannel',
-    name: 'addChannel',
+    path: `/${config.addChannelPath}`,
+    name: config.addChannelPath,
     meta: {
       title: 'ToMu',
     },

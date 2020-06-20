@@ -26,4 +26,14 @@ export const getPropsData = (options) => {
 /**
  * @description 获取是否已经进入频道
  */
-export const getToMuLoginChanneFlag = () => store2.local(config.loginChannelName)
+export const getToMuLoginChanneFlag = () => store2[config.storageType](config.loginChannelName)
+
+/**
+ * @description 退出
+ */
+export const signOut = (router) => {
+  store2[config.storageType](config.loginChannelName, false)
+  setTimeout(() => {
+    router.push(config.addChannelPath)
+  }, 800)
+}

@@ -12,6 +12,10 @@ export default {
    */
   loginChannelName: 'ToMuLoginChanne',
   /**
+   * @description 设置全局存储类型
+   */
+  storageType: 'session',
+  /**
    * @description 音乐播放源地址
    */
   serverLink: [

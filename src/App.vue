@@ -7,6 +7,11 @@
 <script>
 export default {
   name: 'App',
+  data () {
+    return {
+      className: ''
+    }
+  }
 }
 </script>
 
@@ -22,7 +27,7 @@ export default {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: #333;
-    background: #ffffff;
+    background: url("~@/assets/image/bg.jpg") center no-repeat;
     >div{
       height: 100%;
     }
