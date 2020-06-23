@@ -1,45 +1,84 @@
 <template>
-<div class="header clearfix">
-  <div class="logo fl"><img src="@/assets/image/logo.png"/></div>
-  <div class="fr SentyPea">
-    <ul>
-      <li>
-        <a href="javascript:;">
-          <Icon
-            type="md-heart"
-            size="16"
-          />收藏
-        </a>
-      </li>
-      <li>
-        <a href="javascript:;">
-          <Icon
-            type="ios-headset"
-            size="18"
-          />邀请
-        </a>
-      </li>
-      <li>
-        <a href="javascript:;" @click="signOut">
-          <Icon
-            type="ios-alarm"
-            size="18"
-          />离开
-        </a>
-      </li>
-    </ul>
+<div class="header">
+  <div class="clearfix">
+    <div class="logo fl"><img src="@/assets/image/logo.png"/></div>
+    <div class="fr SentyPea">
+      <ul>
+        <li v-if="!newChannelFlag">
+          <a href="javascript:;" @click="addFavorite">
+            <Icon
+              type="md-heart"
+              size="16"
+            />收藏
+          </a>
+        </li>
+        <li v-if="!newChannelFlag">
+          <a href="javascript:;" @click="invite">
+            <Icon
+              type="ios-headset"
+              size="18"
+            />邀请
+          </a>
+        </li>
+        <li>
+          <a href="javascript:;" @click="signOut">
+            <Icon
+              type="ios-alarm"
+              size="18"
+            />离开
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="invite-box" v-show="inviteFlag">
+    <div class="clearfix invite-box-header">
+      <div class="fl title SentyPea">邀请伙伴加入频道</div>
+      <div class="fr" @click="closeInvite">
+        <Icon
+          type="md-close-circle"
+          size="22"
+          color="#2d8cf0"
+        />
+      </div>
+    </div>
+    <div class="code" ref="inviteCode"></div>
+    <div class="invite-box-footer">
+      <Button
+        v-clipboard:copy="url"
+        v-clipboard:success="onCopy"
+        v-clipboard:error="onError"
+        type="warning"
+        long>复制频道链接</Button>
+    </div>
   </div>
 </div>
 </template>
 
 <script>
 import {
-  signOut
+  signOut,
+  addFavorite
 } from '@/libs/util'
 import { mapMutations } from 'vuex';
+import QRCode from 'qrcodejs2'
 
 export default {
   name: 'pageHeader',
+  data () {
+    return {
+      inviteFlag: false,
+      url: 'https://www.lefer.cn/'
+    }
+  },
+  props: {
+    newChannelFlag: {
+      default() {
+        return true;
+      },
+      type: Boolean
+    }
+  },
   methods: {
     ...mapMutations([
       'setSignOut'
@@ -50,6 +89,40 @@ export default {
     signOut () {
       this.setSignOut(true)
       signOut(this.$router)
+    },
+    /*
+    * 加入收藏
+    * */
+    addFavorite () {
+      addFavorite()
+    },
+    /*
+    * 邀请
+    * */
+    invite () {
+      this.inviteFlag = !this.inviteFlag
+      this.$refs.inviteCode.innerHTML = ''
+      /* eslint-disable no-new */
+      new QRCode(this.$refs.inviteCode, {
+        text: this.url,
+        width: 220,
+        height: 220
+      })
+    },
+    /*
+    * 关闭邀请
+    * */
+    closeInvite () {
+      this.inviteFlag = !this.inviteFlag
+    },
+    /*
+    * 复制
+    * */
+    onCopy () {
+      this.$Message.success('分享链接已复制到剪切板！')
+    },
+    onError () {
+      this.$Message.error('抱歉，复制失败！')
     }
   }
 }
@@ -60,35 +133,68 @@ export default {
     position: fixed;
     left: 0;
     top: 0;
-    z-index: 1;
     width: 100%;
     height: 65px;
-    .logo{
-      padding: 10px 0 0 50px;
-      img {height: 45px;}
-    }
-    .fr {
+    z-index: 10;
+    >div.clearfix{
       height: 100%;
-      ul {
+      .logo{
+        padding: 10px 0 0 50px;
+        img {height: 45px;}
+      }
+      .fr {
         height: 100%;
-        li{
-          margin-right: 20px;
-          float: left;
-          align-items:center;
-          justify-content:center;
-          display:-webkit-flex;
+        ul {
           height: 100%;
-          a{
-            display: block;
-            color: #333333;
-            i{margin-right: 5px}
+          li{
+            margin-right: 20px;
+            float: left;
+            align-items:center;
+            justify-content:center;
+            display:-webkit-flex;
+            height: 100%;
+            a{
+              display: block;
+              color: #333333;
+              i{margin-right: 5px}
+            }
           }
         }
       }
+      @media only screen and (max-width: 700px) and (min-width:0px) {
+        .logo{
+          padding: 10px 0 0 10px;
+        }
+      }
     }
-    @media only screen and (max-width: 700px) and (min-width:0px) {
-      .logo{
-        padding: 10px 0 0 10px;
+    .invite-box{
+      width: 240px;
+      background: #ffffff;
+      padding: 10px;
+      position: fixed;
+      z-index: 9999;
+      left: 50%;
+      top: 10%;
+      border-radius: 15px;
+      margin-left: -120px;
+      box-shadow: 0 2px 2px 0 rgba(0,0,0,.07), 0 1px 5px 0 rgba(0,0,0,.1);
+      .invite-box-header{
+        padding-bottom: 10px;
+        .title{
+          font-size: 18px;
+          color: #2d8cf0;
+        }
+        .fr{
+          padding-top: 3px;
+        }
+      }
+      .code{
+        img{
+          width: 100%;
+        }
+      }
+      .invite-box-footer{
+        padding-top: 10px;
       }
     }
   }

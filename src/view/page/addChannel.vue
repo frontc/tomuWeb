@@ -34,7 +34,7 @@
           </Col>
         </Row>
       </div>
-      <div class="copy-right SentyPea">Copyright @ 2011-2020 MoTu All Rights Reserved.</div>
+      <div class="copy-right SentyPea">Copyright @ 2011-2020 ToMu All Rights Reserved.</div>
     </div>
   </div>
 </div>
@@ -59,7 +59,8 @@ export default {
   },
   methods: {
     ...mapMutations([
-      'resetSystemInfo'
+      'resetSystemInfo',
+      'setNewChannel'
     ]),
     /*
     * 初始化系统基本设置
@@ -81,6 +82,7 @@ export default {
     * 新增频道
     * */
     addChannel () {
+      this.setNewChannel()
       this.goToHome()
     },
     /*

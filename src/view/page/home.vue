@@ -1,7 +1,102 @@
 <template>
 <div class="home-main">
   <div class="home-body">
-    <div class="home-player">
+    <div class="newChannel" v-if="newChannelFlag">
+      <div class="SentyPea title">您还未添加歌曲请先添加歌曲</div>
+      <div class="newChannel-handle">
+        <div class="clearfix music-platform">
+          <div class="body">
+            <div class="nav-list clearfix">
+              <div>
+                <ul>
+                  <li
+                    v-for="(item, index) in musicPlatform"
+                    :key="index"
+                    :class="{on: index === ins}"
+                    @click='tabPlatform(index, item.type)'
+                  >
+                    <a href="javascript:;"><img :src='item.logo'/></a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div
+              class="song-list"
+              v-for="(item, index) in musicPlatform"
+              :key="index"
+            >
+              <div class="song-list-body" v-if="index === ins">
+                <div class="song-list-header">
+                  <div class="tab">
+                    <RadioGroup
+                      v-model="item.addSongTypeName"
+                      @on-change="tabSongType(index)"
+                    >
+                      <Radio label="歌单"></Radio>
+                      <Radio label="单歌曲"></Radio>
+                    </RadioGroup>
+                  </div>
+                  <div class="form">
+                    <div class="clearfix form-handle" v-if="item.addSongType">
+                      <div class="fl">
+                        <Input
+                          v-model="item.listValue"
+                        >
+                          <span slot="prepend">{{ item.listUrl }}</span>
+                          <span slot="append" v-if="item.listUrlType !== ''">{{ item.listUrlType }}</span>
+                        </Input>
+                      </div>
+                      <div class="fr clearfix">
+                        <Button @click="initSongList(item, 'playlist')">添加歌单</Button>
+                        <a href="https://music.163.com/#/playlist?id=4912458725" target="_blank">查看示例链接</a>
+                      </div>
+                    </div>
+                    <div class="clearfix form-handle" v-else>
+                      <div v-if="item.songUrl !== ''">
+                        <div class="fl">
+                          <Input
+                            v-model="item.songValue"
+                          >
+                            <span slot="prepend">{{ item.songUrl }}</span>
+                            <span slot="append" v-if="item.songUrlType !== ''">{{ item.songUrlType }}</span>
+                          </Input>
+                        </div>
+                        <div class="fr clearfix">
+                          <Button @click="initSongList(item, 'song')">添加歌曲</Button>
+                          <a href="https://music.163.com/#/song?id=1377909454" target="_blank">查看示例链接</a>
+                        </div>
+                      </div>
+                      <div v-else>该平台暂不支持此方式添加</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="song-list-footer">
+                  <ul>
+                    <li
+                      v-for="(item, index) in addSongListData"
+                      :key="index"
+                    >
+                      <Checkbox
+                        v-model="item.flag"
+                        @on-change="selectSong(item, index)"
+                      >{{ item.title }}</Checkbox>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="generate-playlist" v-if="addSongListData.length > 0">
+              <Button
+                type="success"
+                long
+                @click="generatePlaylist"
+              >完成选择</Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-else class="home-player">
       <div class="clearfix home-player-info">
         <div class="fl title clearfix">
           <Icon
@@ -31,24 +126,27 @@
                   <i class="iconfont icon-gecishezhi_"></i>歌词
                 </a>
               </li>
-              <li :class="aplayListFlag ? 'on' : ''">
+              <!-- <li :class="aplayListFlag ? 'on' : ''">
                 <a href="javascript:;"  @click="aplayListShowFlag">
                   <i class="iconfont icon-jiarugedan"></i>已选歌单
                 </a>
-              </li>
+              </li> -->
             </ul>
           </div>
         </div>
         <tomu-aplayer
           @play="play"
           @pause="pause"
+          @loadstart="setPlayImage"
+          :destroy="homeSignOut"
+          :playList="songList"
           ref="aplayer"
         ></tomu-aplayer>
       </div>
       <div class="home-tomu-handle">
         <ul>
           <li>
-            <a href="javascript:;">
+            <a href="javascript:;"  @click="aplayListShowFlag">
               <Icon type="md-list" /><span class="SentyPea">歌单</span>
             </a>
           </li>
@@ -71,6 +169,12 @@
 
 <script>
 import tomuAplayer from '@/components/tomuAplayer.vue'
+import { mapState, mapMutations } from 'vuex';
+import config from '@/config'
+import {
+  addSongData,
+  saveSongList
+} from '@/libs/util'
 
 export default {
   name: 'pageHome',
@@ -78,27 +182,134 @@ export default {
     return {
       aplayListFlag: false,
       lrcFlag: true,
-      addClass: ''
+      newChannelFlag: true,
+      addClass: '',
+      musicPlatform: [],
+      ins: 0,
+      addSongList: []
     }
   },
   components: {
     tomuAplayer
   },
+  computed: {
+    ...mapState([
+      'homeSignOut',
+      'newChannel',
+      'songList'
+    ]),
+    musicPlatformData: {
+      get () {
+        return this.musicPlatform
+      },
+      set (data) {
+        this.musicPlatform = data
+      }
+    },
+    addSongListData: {
+      get () {
+        return this.addSongList
+      },
+      set (data) {
+        this.addSongList = data
+      }
+    }
+  },
   methods: {
+    ...mapMutations([
+      'setSongList'
+    ]),
+    /*
+    * 初始化
+    * */
+    initHome () {
+      if (this.songList.length === 0 && this.newChannel) {
+        this.newChannelFlag = true
+        // 赋值切换类型
+        this.musicPlatformData = config.musicPlatform
+      } else {
+        this.newChannelFlag = false
+      }
+    },
+    /*
+    * 切换平台
+    * */
+    tabPlatform (num, type) {
+      this.ins = num
+      console.log(type)
+    },
+    /*
+    * 切换歌曲添加方式
+    * */
+    tabSongType (index) {
+      this.musicPlatformData[index].addSongType = !this.musicPlatformData[index].addSongType
+    },
+    /*
+    * 初始化列表
+    * */
+    async initSongList (options, type) {
+      const { addSongListData } = this
+      let id = (type === 'song') ? options.songValue : options.listValue
+      const songListData = await this.$api.getSongList({
+        server: options.type,
+        type,
+        id
+      })
+      const data = addSongData(addSongListData, songListData)
+      this.addSongListData = data
+    },
+    /*
+    * 选择歌曲
+    * */
+    selectSong (data, index) {
+      this.addSongListData[index].flag = data.flag
+    },
+    /*
+    * 生成已选择的歌曲列表
+    * */
+    generatePlaylist () {
+      let songList = this.addSongListData
+      if (songList.length > 0) {
+        this.copyRightApi(saveSongList(songList))
+      } else {
+        this.$Message.info('请先选择歌曲')
+      }
+    },
+    /*
+    * 验证歌曲版权
+    * */
+    async copyRightApi (list) {
+      // await Promise.all(Object.values(list).map((data) => this.$api.copyRightApi(data.url)))
+      this.newChannelFlag = false
+      this.setSongList(list)
+    },
     /*
     * 自定义播放动画所需元素
     * */
-    setPlayImage () {
+    async setPlayImage () {
       const handle = document.getElementsByClassName('aplayer-pic')[0];
-      // 添加封面
+      let {
+        style: {
+          backgroundImage
+        }
+      } = handle
+      backgroundImage = backgroundImage.substring(5, backgroundImage.length - 2)
+      let picResponseURL = await this.$api.getPicUrl(backgroundImage)
+      let picUrl = picResponseURL.responseURL.substring(0, picResponseURL.responseURL.length - 5)
+      picUrl = `background-image: url('${picUrl}190y190');`
+      // 添加高清封面
       const newBox = document.createElement('div')
-      newBox.className = 'aplayImage'
-      const handleStyle = handle.style.cssText
-      handle.appendChild(newBox);
+      const handleStyle = picUrl
+      if (!document.getElementsByClassName('aplayImage')[0]) {
+        newBox.className = 'aplayImage'
+        handle.appendChild(newBox);
+      }
       // 添加CD
       const cdBox = document.createElement('div')
-      cdBox.className = 'cdImage'
-      handle.appendChild(cdBox);
+      if (!document.getElementsByClassName('cdImage')[0]) {
+        cdBox.className = 'cdImage'
+        handle.appendChild(cdBox);
+      }
       const aplayImageBox = document.getElementsByClassName('aplayImage')[0];
       aplayImageBox.style.cssText = handleStyle
     },
@@ -136,7 +347,9 @@ export default {
     }
   },
   mounted() {
-    this.setPlayImage()
+    // 初始化
+    this.initHome()
+
     /* const source = new EventSource('https://tomu.orous.cn/api/v1/channel/520/status');
 
     source.addEventListener('open', () => {
@@ -166,8 +379,103 @@ export default {
       align-items:center;
       justify-content:center;
       display:-webkit-flex;
+      .newChannel{
+        .title{
+          font-size: 20px;
+        }
+        .newChannel-handle{
+          position: fixed;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(255,255,255,0.2);
+          z-index: 99999999;
+          align-items:center;
+          justify-content:center;
+          display:-webkit-flex;
+          .music-platform{
+            width: 800px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.7);
+            @media only screen and (max-width: 820px) and (min-width:0px) {
+              width: 90%;
+            }
+            .body{
+              padding: 20px;
+              .nav-list{
+                ul li{
+                  float: left;
+                  width: 25%;
+                  text-align: center;
+                  height: 35px;
+                  @media only screen and (max-width: 820px) and (min-width:0px) {
+                    width: 50%;
+                  }
+                  a{
+                    display: inline-block;
+                    img{
+                      height: 20px;
+                    }
+                  }
+                }
+                ul li.on a{
+                  border-bottom: 1px #999999 dashed;
+                }
+              }
+              .song-list{
+                .song-list-header{
+                  padding-top: 15px;
+                  text-align: center;
+                  .tab{
+                    padding-bottom: 10px;
+                  }
+                  padding-bottom: 10px;
+                  .form{
+                    .form-handle{
+                      .fl{
+                        width: 560px;
+                        @media only screen and (max-width: 820px) and (min-width:0px) {
+                          float: none;
+                          display: block;
+                          width: 100%;
+                        }
+                      }
+                      .fr {
+                        button{margin-right: 10px;}
+                        @media only screen and (max-width: 820px) and (min-width:0px) {
+                          float: none;
+                          display: block;
+                          padding-top: 10px;
+                        }
+                      }
+                    }
+                  }
+                }
+                .song-list-footer{
+                  max-height: 300px;
+                  overflow: auto;
+                  ul li{
+                    padding: 6px 6px 6px 11px;
+                    background: #ffffff;
+                    float: left;
+                    border: 1px #d8d8d8 dashed;
+                    margin: 5px 5px 5px 0;
+                    .ivu-checkbox-inner{margin-right: 5px}
+                  }
+                }
+              }
+              .generate-playlist{
+                padding-top: 10px;
+              }
+            }
+          }
+        }
+      }
       .home-player{
         padding: 30px 0;
+        width: 800px;
         max-width: 800px;
         margin: 0 auto;
         @media only screen and (max-width: 820px) and (min-width:0px) {
@@ -186,7 +494,7 @@ export default {
           .fr{padding-top: 4px;}
         }
         .tomu-aplayer-handle{
-          padding: 10px 30px 0 30px;
+          padding: 10px 0px 0 0px;
           ul li {
             float: left;
             margin-left: 15px;
@@ -334,6 +642,9 @@ export default {
                   width: 35px;
                   height: 24px;
                 }
+                .aplayer-icon-menu{
+                  display: none;
+                }
                 .aplayer-volume-bar-wrap{
                   right: 8px;
                   bottom: 30px;
@@ -355,11 +666,12 @@ export default {
             margin-left: -300px;
             width: 100%;
             max-width: 600px;
+            max-height: 440px;
             background: #ffffff;
             z-index: 9999;
             overflow: visible;
             box-shadow: 0 6px 6px 0 rgba(0,0,0,.07), 0 1px 5px 0 rgba(0,0,0,.1);
-            ol{padding: 20px}
+            ol{}
           }
           @media only screen and (max-width: 600px) and (min-width:0px) {
             .aplayer-list {

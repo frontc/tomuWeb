@@ -49,7 +49,7 @@ export default {
     * */
     type: {
       default() {
-        return 'song';
+        return 'playlist';
       },
       type: String
     },
@@ -59,7 +59,7 @@ export default {
     * */
     auto: {
       default() {
-        return 'https://music.163.com/#/playlist?id=60198';
+        return '';
       },
       type: String
     },
@@ -69,7 +69,7 @@ export default {
     * */
     url: {
       default() {
-        return 'https://api.i-meto.com/meting/api?server=netease&type=url&id=1441183869&auth=31c3ef95962dfcd49b5b667011901a31dcec861e';
+        return '';
       },
       type: String
     },
@@ -178,7 +178,7 @@ export default {
     * */
     lrc: {
       default() {
-        return 'https://api.i-meto.com/meting/api?server=netease&type=lrc&id=1441183869&auth=bcb522602d52b5c8d916643f8c02b2150cf5c99c';
+        return '';
       },
       type: String
     },
@@ -188,7 +188,7 @@ export default {
     * */
     pic: {
       default() {
-        return 'https://p3.music.126.net/FLoKNesjpaotmN-qGj9m_A==/109951164912637120.jpg?param=390y390';
+        return '';
       },
       type: String
     },
@@ -227,6 +227,24 @@ export default {
         return null;
       },
       type: Object
+    },
+    /*
+    * 销毁播放器
+    * */
+    destroy: {
+      default() {
+        return false;
+      },
+      type: Boolean
+    },
+    /*
+    * 播放列表
+    * */
+    playList: {
+      default() {
+        return [];
+      },
+      type: Array
     }
   },
   methods: {
@@ -257,10 +275,10 @@ export default {
     /*
     * 设置播放属性
     * */
-    setAplayerOptions () {
+    async setAplayerOptions () {
+      let options = this.aplayerOptions
       // 设置播放所需属性
-      if (this.aplayerOptions.url) {
-        let options = this.aplayerOptions
+      if (this.aplayerOptions.url && this.aplayerOptions.url != '') {
         let newOption = {
           name: options.name || options.title || 'Audio name',
           artist: options.artist || options.author || 'Audio artist',
@@ -275,21 +293,14 @@ export default {
         }
         this.loadPlayer([newOption])
       }
+      if (options.playList.length > 0) {
+        this.loadPlayer(options.playList)
+      }
     },
     /*
     * 开始播放
     * */
     loadPlayer (data) {
-      data.push(data[0])
-      data.push(data[0])
-      data.push(data[0])
-      data.push(data[0])
-      data.push(data[0])
-      data.push(data[0])
-      data.push(data[0])
-      data.push(data[0])
-      data.push(data[0])
-      data.push(data[0])
       let defaultOption = {
         audio: data,
         mutex: true,
@@ -308,8 +319,10 @@ export default {
       })
       options.container = this.$refs.aplayer
       /* eslint-disable no-new */
-      console.log(options)
       this.ap = new APlayer(options)
+      this.ap.on('loadstart', () => {
+        this.$emit('loadstart')
+      });
       // 播放
       this.ap.on('play', () => {
         this.ap.list.hide()
@@ -331,6 +344,16 @@ export default {
     * */
     aplayListFlag () {
       this.ap.list.toggle()
+    }
+  },
+  watch: {
+    /*
+    * 销毁播放器
+    * */
+    destroy (data) {
+      if (data) {
+        this.ap.pause()
+      }
     }
   },
   mounted() {

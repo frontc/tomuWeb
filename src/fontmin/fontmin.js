@@ -2,7 +2,7 @@ let Fontmin = require('fontmin'); // 引入插件，当第一步中，使用全�
 
 let srcPath = './font/SentyPea.ttf'; // 字体源文件路径，需要保证该ttf文件存在
 let destPath = '../assets/font';    // 字体输出路径
-let text = '当前频道:收藏邀请离开已听首歌词已选歌单ToMu-让音乐连接你我新建进入号歌单随便听听搜索'; //这里进行配置需要用到的字符，可以是中文或英文字母
+let text = '当前频道:收藏邀请离开已听首歌词已选歌单ToMu-让音乐连接你我新建进入号歌单随便听听搜索邀请伙伴加入频道您还未添加歌曲请先添加歌曲该平台暂不支持此方式'; //这里进行配置需要用到的字符，可以是中文或英文字母
 
 // 初始化
 let fontmin = new Fontmin()

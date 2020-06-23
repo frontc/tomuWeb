@@ -7,9 +7,10 @@
     <div>
       <page-header
         class="system-header"
+        :newChannelFlag="newChannelFlag"
       >
       </page-header>
-      <div class="home-content">
+      <div class="home-content" :style="newChannelFlag ? 'z-index:9999' : ''">
         <router-view/>
       </div>
       <page-footer/>
@@ -27,7 +28,8 @@ export default {
   name: 'index',
   data () {
     return {
-      addClass: ''
+      addClass: '',
+      newChannelFlag: true
     }
   },
   components: {
@@ -36,7 +38,9 @@ export default {
   },
   computed: {
     ...mapState([
-      'homeSignOut'
+      'homeSignOut',
+      'newChannel',
+      'songList'
     ])
   },
   watch: {
@@ -46,6 +50,13 @@ export default {
     homeSignOut (data) {
       if (data) {
         this.addClass = 'animate__zoomOut_center'
+      }
+    },
+    newChannel (data) {
+      if (data) {
+        this.newChannelFlag = true
+      } else {
+        this.newChannelFlag = false
       }
     }
   }

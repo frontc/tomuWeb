@@ -1,6 +1,6 @@
 <template>
 <div class="footer SentyPea">
-  Copyright @ 2011-2020 MoTu All Rights Reserved.
+  Copyright @ 2011-2020 ToMu All Rights Reserved.
 </div>
 </template>
 

@@ -9,6 +9,9 @@ const handleServeSuccess = (res) => {
     // 业务错误
     return Promise.reject(res);
   }
+  if (res.config.geRequest != undefined && res.config.geRequest) {
+    return res.request
+  }
   return res.data;
 };
 
