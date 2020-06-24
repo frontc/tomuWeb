@@ -182,7 +182,7 @@ export const addCdImage = (el) => {
 }
 
 /**
- * @description 添加CD
+ * @description 获取当前正在播放的歌曲index
  */
 export const getThisPlayer = (list, player) => {
   let index = 0
