@@ -30,28 +30,30 @@
                   <div class="tab">
                     <RadioGroup
                       v-model="item.addSongTypeName"
-                      @on-change="tabSongType(index)"
+                      @on-change="tabSongType(item.addSongTypeName, index)"
                     >
                       <Radio label="歌单"></Radio>
                       <Radio label="单歌曲"></Radio>
+                      <Radio label="歌手"></Radio>
+                      <Radio label="搜索"></Radio>
                     </RadioGroup>
                   </div>
                   <div class="form">
-                    <div class="clearfix form-handle" v-if="item.addSongType">
+                    <div class="clearfix form-handle" v-if="item.addSongTypeName === '歌单'">
                       <div class="fl">
                         <Input
-                          v-model="item.listValue"
+                          v-model="item.playlistValue"
                         >
-                          <span slot="prepend">{{ item.listUrl }}</span>
-                          <span slot="append" v-if="item.listUrlType !== ''">{{ item.listUrlType }}</span>
+                          <span slot="prepend">{{ item.playlistUrl }}</span>
+                          <span slot="append" v-if="item.playlistUrlType !== ''">{{ item.playlistUrlType }}</span>
                         </Input>
                       </div>
                       <div class="fr clearfix">
                         <Button @click="initSongList(item, 'playlist')">添加歌单</Button>
-                        <a href="https://music.163.com/#/playlist?id=4912458725" target="_blank">查看示例链接</a>
+                        <a :href="`${item.playlistUrl}0${item.playlistUrlType}`" target="_blank">查看示例链接</a>
                       </div>
                     </div>
-                    <div class="clearfix form-handle" v-else>
+                    <div class="clearfix form-handle" v-else-if="item.addSongTypeName === '单歌曲'">
                       <div v-if="item.songUrl !== ''">
                         <div class="fl">
                           <Input
@@ -63,7 +65,39 @@
                         </div>
                         <div class="fr clearfix">
                           <Button @click="initSongList(item, 'song')">添加歌曲</Button>
-                          <a href="https://music.163.com/#/song?id=1377909454" target="_blank">查看示例链接</a>
+                          <a :href="`${item.songUrl}0${item.songUrlType}`" target="_blank">查看示例链接</a>
+                        </div>
+                      </div>
+                      <div v-else>该平台暂不支持此方式添加</div>
+                    </div>
+                    <div class="clearfix form-handle" v-else-if="item.addSongTypeName === '歌手'">
+                      <div v-if="item.artistUrl !== ''">
+                        <div class="fl">
+                          <Input
+                            v-model="item.artistValue"
+                          >
+                            <span slot="prepend">{{ item.artistUrl }}</span>
+                            <span slot="append" v-if="item.artistUrlType !== ''">{{ item.artistUrlType }}</span>
+                          </Input>
+                        </div>
+                        <div class="fr clearfix">
+                          <Button @click="initSongList(item, 'artist')">添加歌曲</Button>
+                          <a :href="`${item.artistUrl}0${item.artistUrlType}`" target="_blank">查看示例链接</a>
+                        </div>
+                      </div>
+                      <div v-else>该平台暂不支持此方式添加</div>
+                    </div>
+                    <div class="clearfix form-handle" v-else-if="item.addSongTypeName === '搜索'">
+                      <div v-if="item.artistUrl !== ''">
+                        <div class="fl">
+                          <Input
+                            v-model="item.searchValue"
+                          >
+                            <span slot="prepend">{{ item.title }}</span>
+                          </Input>
+                        </div>
+                        <div class="fr clearfix" style="width: 190px">
+                          <Button @click="initSongList(item, 'search')" long>搜索歌曲</Button>
                         </div>
                       </div>
                       <div v-else>该平台暂不支持此方式添加</div>
@@ -79,7 +113,7 @@
                       <Checkbox
                         v-model="item.flag"
                         @on-change="selectSong(item, index)"
-                      >{{ item.title }}</Checkbox>
+                      ><b>{{ item.title }}</b> - {{ item.author }}</Checkbox>
                     </li>
                   </ul>
                 </div>
@@ -138,7 +172,9 @@
           @play="play"
           @pause="pause"
           @loadstart="setPlayImage"
+          @error="error"
           :destroy="homeSignOut"
+          :pause="pauseFlag"
           :playList="songList"
           ref="aplayer"
         ></tomu-aplayer>
@@ -173,7 +209,12 @@ import { mapState, mapMutations } from 'vuex';
 import config from '@/config'
 import {
   addSongData,
-  saveSongList
+  saveSongList,
+  getSongBackgroundImage,
+  addSongImage,
+  addCdImage,
+  byClass,
+  getThisPlayer
 } from '@/libs/util'
 
 export default {
@@ -186,7 +227,9 @@ export default {
       addClass: '',
       musicPlatform: [],
       ins: 0,
-      addSongList: []
+      addSongList: [],
+      thisPlayerInfo: {},
+      pauseFlag: false
     }
   },
   components: {
@@ -234,28 +277,29 @@ export default {
     /*
     * 切换平台
     * */
-    tabPlatform (num, type) {
+    tabPlatform (num) {
       this.ins = num
-      console.log(type)
     },
     /*
     * 切换歌曲添加方式
     * */
-    tabSongType (index) {
-      this.musicPlatformData[index].addSongType = !this.musicPlatformData[index].addSongType
+    tabSongType (value, index) {
+      this.musicPlatformData[index].addSongType = value
     },
     /*
     * 初始化列表
     * */
     async initSongList (options, type) {
-      const { addSongListData } = this
-      let id = (type === 'song') ? options.songValue : options.listValue
+      const {
+        addSongListData
+      } = this
+      let id = options[`${type}Value`]
       const songListData = await this.$api.getSongList({
         server: options.type,
         type,
         id
       })
-      const data = addSongData(addSongListData, songListData)
+      const data = addSongData(addSongListData, songListData, options.type)
       this.addSongListData = data
     },
     /*
@@ -268,9 +312,11 @@ export default {
     * 生成已选择的歌曲列表
     * */
     generatePlaylist () {
-      let songList = this.addSongListData
-      if (songList.length > 0) {
-        this.copyRightApi(saveSongList(songList))
+      let {
+        addSongListData
+      } = this
+      if (addSongListData.length > 0) {
+        this.copyRightApi(saveSongList(addSongListData))
       } else {
         this.$Message.info('请先选择歌曲')
       }
@@ -287,37 +333,32 @@ export default {
     * 自定义播放动画所需元素
     * */
     async setPlayImage () {
-      const handle = document.getElementsByClassName('aplayer-pic')[0];
-      let {
-        style: {
-          backgroundImage
-        }
-      } = handle
-      backgroundImage = backgroundImage.substring(5, backgroundImage.length - 2)
-      let picResponseURL = await this.$api.getPicUrl(backgroundImage)
-      let picUrl = picResponseURL.responseURL.substring(0, picResponseURL.responseURL.length - 5)
-      picUrl = `background-image: url('${picUrl}190y190');`
+      // 获取歌曲封面
+      const backgroundImage = getSongBackgroundImage('aplayer-pic')
+      let picUrl = ''
+      if (this.thisPlayerInfo.songSource === 'netease' || this.songList[0].songSource === 'netease') {
+        let picResponseURL = await this.$api.getPicUrl(backgroundImage)
+        picUrl = picResponseURL.responseURL.substring(0, picResponseURL.responseURL.length - 5)
+        picUrl = `background-image: url('${picUrl}190y190');`
+      } else if (this.thisPlayerInfo.songSource === 'tencent' || this.songList[0].songSource === 'tencent') {
+        picUrl = `background-image: url('${backgroundImage}');`
+      } else if (this.thisPlayerInfo.songSource === 'kugou' || this.songList[0].songSource === 'kugou') {
+        picUrl = 'background-image: url(\'https://www.ooorq.com/image/kugou-190.png\');'
+      } else if (this.thisPlayerInfo.songSource === 'baidu' || this.songList[0].songSource === 'baidu') {
+        picUrl = `background-image: url('${backgroundImage}');`
+      }
       // 添加高清封面
-      const newBox = document.createElement('div')
-      const handleStyle = picUrl
-      if (!document.getElementsByClassName('aplayImage')[0]) {
-        newBox.className = 'aplayImage'
-        handle.appendChild(newBox);
-      }
+      addSongImage('aplayer-pic', picUrl)
       // 添加CD
-      const cdBox = document.createElement('div')
-      if (!document.getElementsByClassName('cdImage')[0]) {
-        cdBox.className = 'cdImage'
-        handle.appendChild(cdBox);
-      }
-      const aplayImageBox = document.getElementsByClassName('aplayImage')[0];
-      aplayImageBox.style.cssText = handleStyle
+      addCdImage('aplayer-pic')
     },
     /*
     * 播放
     * */
-    play () {
-      const handle = document.getElementsByClassName('aplayer-pic')[0];
+    play (d) {
+      // 获取正在播放的歌曲
+      this.thisPlayerInfo = this.songList[getThisPlayer(this.songList, d)]
+      const handle = byClass('aplayer-pic');
       handle.setAttribute('class', 'aplayer-pic aplayer-pic-play')
       // 延迟一秒播放动画
       setTimeout(() => {
@@ -328,8 +369,20 @@ export default {
     * 暂停
     * */
     pause () {
-      const handle = document.getElementsByClassName('aplayer-pic')[0];
+      const handle = byClass('aplayer-pic');
       handle.setAttribute('class', 'aplayer-pic')
+    },
+    /*
+    * 错误
+    * */
+    error (data) {
+      // 获取正在播放的歌曲
+      const songIndex = getThisPlayer(this.songList, data)
+      const thisPlayerInfo = this.songList[songIndex]
+      this.$Message.error(`抱歉， ${thisPlayerInfo.title} - ${thisPlayerInfo.artist} 牵涉版权问题暂时无法播放`)
+      if (parseFloat(songIndex) + 1 === this.songList.length) {
+        this.pauseFlag = true
+      }
     },
     /*
     * 显示关闭歌词
@@ -552,7 +605,7 @@ export default {
                 width: 36px;
                 height: 36px;
                 margin: 0 -20px -20px 0;
-                background: rgba(255,255,255,0.15);
+                background: rgba(0,0,0,0.15);
                 svg{
                   width: 20px;
                   height: 20px;

@@ -62,13 +62,14 @@ import {
 } from '@/libs/util'
 import { mapMutations } from 'vuex';
 import QRCode from 'qrcodejs2'
+import config from '@/config'
 
 export default {
   name: 'pageHeader',
   data () {
     return {
       inviteFlag: false,
-      url: 'https://www.lefer.cn/'
+      url: config.url
     }
   },
   props: {

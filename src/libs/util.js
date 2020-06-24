@@ -5,6 +5,16 @@ import {
 } from 'view-design'
 
 /**
+ * @description 获取ID
+ */
+export const byId = (name) => document.getElementById(name)
+
+/**
+ * @description 获取Class
+ */
+export const byClass = (name) => document.getElementsByClassName(name)[0]
+
+/**
  * @description 自动补充options模式下的参数
  */
 export const setOptionsData = (options, configProps) => {
@@ -59,13 +69,15 @@ export const addFavorite = () => {
 /**
  * @description 向数组里对象添加属性
  */
-export const addArrayAttr = (data, attrName, attrValue) => {
+export const addArrayAttr = (data, options) => {
   let newArray = []
   Object.keys(data).forEach((i) => {
     let obj = data[i]
-    if (obj[attrName] === undefined) {
-      obj[attrName] = attrValue
-    }
+    Object.keys(options).forEach((a) => {
+      if (obj[a] === undefined) {
+        obj[a] = options[a]
+      }
+    })
     newArray.push(obj)
   })
   return newArray
@@ -74,12 +86,14 @@ export const addArrayAttr = (data, attrName, attrValue) => {
 /**
  * @description 向数组里对象删除属性
  */
-export const removeArrayAttr = (attrName) => {
+export const removeArrayAttr = (options) => {
   let newArray = []
   let dataArray = store2[config.storageType]('addSongData')
   Object.keys(dataArray).forEach((i) => {
     let obj = dataArray[i]
-    delete obj[attrName]
+    Object.keys(options).forEach(a => {
+      delete obj[a]
+    })
     newArray.push(obj)
   })
   return newArray
@@ -88,13 +102,19 @@ export const removeArrayAttr = (attrName) => {
 /**
  * @description 添加歌单
  */
-export const addSongData = (data, addData) => {
+export const addSongData = (data, addData, type) => {
   store2[config.storageType]('addSongData', data)
   if (data.length === 0) {
-    return addArrayAttr(addData, 'flag', false)
+    return addArrayAttr(addData, {
+      flag: false,
+      songSource: type
+    })
   }
   if (data.length > 0) {
-    let dataList = removeArrayAttr('flag')
+    let dataList = removeArrayAttr({
+      flag: false,
+      songSource: type
+    })
     Object.keys(addData).forEach((i) => {
       let hasData = dataList.find(item => (JSON.stringify(item) === JSON.stringify(addData[i])))
       if (hasData === undefined) {
@@ -102,7 +122,10 @@ export const addSongData = (data, addData) => {
       }
     })
   }
-  return data
+  return addArrayAttr(data, {
+    flag: false,
+    songSource: type
+  })
 }
 
 /**
@@ -116,4 +139,57 @@ export const saveSongList = (data) => {
     }
   })
   return newData
+}
+
+/**
+ * @description 获取歌单图片
+ */
+export const getSongBackgroundImage = (el) => {
+  const handle = byClass(el);
+  let {
+    style: {
+      backgroundImage
+    }
+  } = handle
+  return backgroundImage.substring(5, backgroundImage.length - 2)
+}
+
+/**
+ * @description 添加歌曲封面
+ */
+export const addSongImage = (el, picUrl) => {
+  const handle = byClass(el);
+  const newBox = document.createElement('div')
+  const handleStyle = picUrl
+  if (!document.getElementsByClassName('aplayImage')[0]) {
+    newBox.className = 'aplayImage'
+    handle.appendChild(newBox);
+  }
+  const aplayImageBox = byClass('aplayImage');
+  aplayImageBox.style.cssText = handleStyle
+}
+
+/**
+ * @description 添加CD
+ */
+export const addCdImage = (el) => {
+  const handle = byClass(el);
+  const cdBox = document.createElement('div')
+  if (!byClass('cdImage')) {
+    cdBox.className = 'cdImage'
+    handle.appendChild(cdBox);
+  }
+}
+
+/**
+ * @description 添加CD
+ */
+export const getThisPlayer = (list, player) => {
+  let index = 0
+  Object.keys(list).forEach(i => {
+    if (list[i].url === player.path[0].currentSrc) {
+      index = i
+    }
+  })
+  return index
 }

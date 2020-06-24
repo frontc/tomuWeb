@@ -238,6 +238,15 @@ export default {
       type: Boolean
     },
     /*
+    * 暂停播放器
+    * */
+    pause: {
+      default() {
+        return false;
+      },
+      type: Boolean
+    },
+    /*
     * 播放列表
     * */
     playList: {
@@ -324,13 +333,17 @@ export default {
         this.$emit('loadstart')
       });
       // 播放
-      this.ap.on('play', () => {
+      this.ap.on('play', (d) => {
         this.ap.list.hide()
-        this.$emit('play')
+        this.$emit('play', d)
       });
       // 暂停
       this.ap.on('pause', () => {
         this.$emit('pause')
+      });
+      // error
+      this.ap.on('error', (e) => {
+        this.$emit('error', e)
       });
     },
     /*
@@ -351,6 +364,11 @@ export default {
     * 销毁播放器
     * */
     destroy (data) {
+      if (data) {
+        this.ap.pause()
+      }
+    },
+    pause (data) {
       if (data) {
         this.ap.pause()
       }

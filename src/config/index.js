@@ -2,7 +2,7 @@ export default {
   /**
    * @description 网站域名
    */
-  url: 'www.tomu.com',
+  url: 'http://www.tomu.com',
   /**
    * @description 网站名称
    */
@@ -38,50 +38,63 @@ export default {
     title: '网易云音乐',
     logo: 'https://www.ooorq.com/image/wangyi.png',
     type: 'netease',
-    listUrl: 'https://music.163.com/#/playlist?id=',
+    playlistUrl: 'https://music.163.com/#/playlist?id=',
     songUrl: 'https://music.163.com/#/song?id=',
-    listUrlType: '',
+    artistUrl: 'https://music.163.com/#/artist?id=',
+    playlistUrlType: '',
     songUrlType: '',
+    artistUrlType: '',
     addSongTypeName: '歌单',
     addSongType: true,
-    listValue: '',
-    songValue: ''
+    playlistValue: '',
+    songValue: '',
+    artistValue: '',
+    searchValue: ''
   }, {
     title: 'QQ音乐',
     logo: 'https://www.ooorq.com/image/qq.png',
     type: 'tencent',
-    listUrl: 'https://y.qq.com/n/yqq/playlist/',
+    playlistUrl: 'https://y.qq.com/n/yqq/playlist/',
     songUrl: 'https://y.qq.com/n/yqq/song/',
-    listUrlType: '.html',
+    artistUrl: 'https://y.qq.com/n/yqq/singer/',
+    playlistUrlType: '.html',
     songUrlType: '.html',
+    artistUrlType: '.html',
     addSongTypeName: '歌单',
-    addSongType: true,
-    listValue: '',
-    songValue: ''
+    playlistValue: '',
+    songValue: '',
+    artistValue: '',
+    searchValue: ''
   }, {
     title: '酷狗音乐',
     logo: 'https://www.ooorq.com/image/kugou.png',
     type: 'kugou',
-    listUrl: 'https://www.kugou.com/yy/special/single/',
+    playlistUrl: 'https://www.kugou.com/yy/special/single/',
     songUrl: '',
-    listUrlType: '.html',
+    artistUrl: 'https://www.kugou.com/yy/singer/home/',
+    playlistUrlType: '.html',
     songUrlType: '',
+    artistUrlType: '.html',
     addSongTypeName: '歌单',
-    addSongType: true,
-    listValue: '',
-    songValue: ''
+    playlistValue: '',
+    songValue: '',
+    artistValue: '',
+    searchValue: ''
   }, {
     title: '千千音乐',
     logo: 'https://www.ooorq.com/image/qianqian.png',
     type: 'baidu',
-    listUrl: 'http://music.taihe.com/songlist/',
+    playlistUrl: 'http://music.taihe.com/songlist/',
     songUrl: 'http://music.taihe.com/song/',
-    listUrlType: '',
+    artistUrl: 'http://music.taihe.com/artist/',
+    playlistUrlType: '',
     songUrlType: '',
+    artistUrlType: '',
     addSongTypeName: '歌单',
-    addSongType: true,
-    listValue: '',
-    songValue: ''
+    playlistValue: '',
+    songValue: '',
+    artistValue: '',
+    searchValue: ''
   }],
   /**
    * @description 音乐播放源地址
