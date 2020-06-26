@@ -26,7 +26,13 @@ export default {
   /**
    * @description 设置api版本
    */
-  apiVersions: '/api/v1/channel',
+  apiVersions: '/api/v1',
+  /**
+   * @description 设置状态码
+   */
+  code: {
+    ok: 200
+  },
   /**
    * @description 歌单API解析地址
    */

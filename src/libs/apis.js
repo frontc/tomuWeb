@@ -16,13 +16,17 @@ export default {
       baseURL: config.songListApi
     });
   },
-  // 查询频道信息
-  getChannelInfo(channelID) {
-    return axios.get(`${config.apiVersions}/${channelID}`);
+  // 新建频道
+  addChannel() {
+    return axios.post(`${config.apiVersions}/channel`);
   },
   // 新增歌单
   addSong(channelID) {
     return axios.post(`${config.apiVersions}/${channelID}/status`, qs.stringify(channelID));
+  },
+  // 验证歌曲api
+  getChannelInfo (channelID) {
+    return axios.get(`${config.apiVersions}/channel/${channelID}`);
   },
   // 验证歌曲api
   copyRightApi (url) {

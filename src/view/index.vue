@@ -7,10 +7,10 @@
     <div>
       <page-header
         class="system-header"
-        :newChannelFlag="newChannelFlag"
+        :newChannelFlag="newChannel"
       >
       </page-header>
-      <div class="home-content" :style="newChannelFlag ? 'z-index:9999' : ''">
+      <div class="home-content" :style="newChannel ? 'z-index:9999' : ''">
         <router-view/>
       </div>
       <page-footer/>
@@ -28,8 +28,7 @@ export default {
   name: 'index',
   data () {
     return {
-      addClass: '',
-      newChannelFlag: true
+      addClass: ''
     }
   },
   components: {
@@ -50,13 +49,6 @@ export default {
     homeSignOut (data) {
       if (data) {
         this.addClass = 'animate__zoomOut_center'
-      }
-    },
-    newChannel (data) {
-      if (data) {
-        this.newChannelFlag = true
-      } else {
-        this.newChannelFlag = false
       }
     }
   }

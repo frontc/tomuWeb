@@ -104,13 +104,14 @@ export const removeArrayAttr = (options) => {
  */
 export const addSongData = (data, addData, type) => {
   store2[config.storageType]('addSongData', data)
-  if (data.length === 0) {
+  const songData = store2[config.storageType]('addSongData')
+  if (songData.length === 0) {
     return addArrayAttr(addData, {
       flag: false,
       songSource: type
     })
   }
-  if (data.length > 0) {
+  if (songData.length > 0) {
     let dataList = removeArrayAttr({
       flag: false,
       songSource: type
@@ -118,11 +119,11 @@ export const addSongData = (data, addData, type) => {
     Object.keys(addData).forEach((i) => {
       let hasData = dataList.find(item => (JSON.stringify(item) === JSON.stringify(addData[i])))
       if (hasData === undefined) {
-        data.push(addData[i])
+        songData.push(addData[i])
       }
     })
   }
-  return addArrayAttr(data, {
+  return addArrayAttr(songData, {
     flag: false,
     songSource: type
   })

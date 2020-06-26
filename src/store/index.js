@@ -10,6 +10,7 @@ export default new Vuex.Store({
     homeSignOut: false, // 是否离开
     newChannel: false, // 是否是新建频道
     songList: [], // 歌曲列表
+    addFlag: false
   },
   mutations: {
     /*
@@ -24,6 +25,7 @@ export default new Vuex.Store({
     resetSystemInfo (state) {
       state.newChannel = false
       state.homeSignOut = false
+      state.addFlag = false
       state.songList = []
     },
     /*
@@ -31,14 +33,27 @@ export default new Vuex.Store({
     * */
     setNewChannel (state) {
       state.newChannel = true
+      state.addFlag = true
       state.songList = []
+    },
+    /*
+    * 进入频道
+    * */
+    setChannelFlag (state) {
+      state.newChannel = false
+      state.addFlag = false
     },
     /*
     * 设置歌单列表
     * */
     setSongList (state, info) {
-      state.newChannel = false
       state.songList = info
+    },
+    /*
+    * 设置是否添加歌单
+    * */
+    setAddFlag (state, info) {
+      state.addFlag = info
     }
   },
   plugins: [createPersistedState({

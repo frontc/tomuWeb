@@ -1,16 +1,23 @@
 <template>
 <div class="home-main">
   <div class="home-body">
-    <div class="newChannel" v-if="newChannelFlag">
-      <div class="SentyPea title">您还未添加歌曲请先添加歌曲</div>
+    <div
+      class="newChannel"
+      v-show="addFlag"
+      :class="{addSong: continueAddSong}"
+    >
+      <div class="SentyPea title" v-if="!newChannel">您还未添加歌曲请先添加歌曲</div>
       <div class="newChannel-handle">
         <div class="clearfix music-platform">
           <div class="body">
+            <div class="clearfix" v-if="continueAddSong">
+              <Icon class="fr" type="md-close" @click="closeAddSong" size="26" />
+            </div>
             <div class="nav-list clearfix">
               <div>
                 <ul>
                   <li
-                    v-for="(item, index) in musicPlatform"
+                    v-for="(item, index) in musicPlatformData"
                     :key="index"
                     :class="{on: index === ins}"
                     @click='tabPlatform(index, item.type)'
@@ -21,13 +28,13 @@
               </div>
             </div>
             <div
-              class="song-list"
-              v-for="(item, index) in musicPlatform"
+              class="song-list clearfix"
+              v-for="(item, index) in musicPlatformData"
               :key="index"
             >
               <div class="song-list-body" v-if="index === ins">
                 <div class="song-list-header">
-                  <div class="tab">
+                  <div class="tab SentyPea">
                     <RadioGroup
                       v-model="item.addSongTypeName"
                       @on-change="tabSongType(item.addSongTypeName, index)"
@@ -38,18 +45,19 @@
                       <Radio label="搜索"></Radio>
                     </RadioGroup>
                   </div>
-                  <div class="form">
+                  <div class="form SentyPea">
                     <div class="clearfix form-handle" v-if="item.addSongTypeName === '歌单'">
                       <div class="fl">
                         <Input
                           v-model="item.playlistValue"
+                          @keyup.enter.native="initSongList(item, 'playlist')"
                         >
                           <span slot="prepend">{{ item.playlistUrl }}</span>
                           <span slot="append" v-if="item.playlistUrlType !== ''">{{ item.playlistUrlType }}</span>
                         </Input>
                       </div>
                       <div class="fr clearfix">
-                        <Button @click="initSongList(item, 'playlist')">添加歌单</Button>
+                        <Button @click="initSongList(item, 'playlist')" type="warning">添加歌单</Button>
                         <a :href="`${item.playlistUrl}0${item.playlistUrlType}`" target="_blank">查看示例链接</a>
                       </div>
                     </div>
@@ -58,13 +66,14 @@
                         <div class="fl">
                           <Input
                             v-model="item.songValue"
+                            @keyup.enter.native="initSongList(item, 'song')"
                           >
                             <span slot="prepend">{{ item.songUrl }}</span>
                             <span slot="append" v-if="item.songUrlType !== ''">{{ item.songUrlType }}</span>
                           </Input>
                         </div>
                         <div class="fr clearfix">
-                          <Button @click="initSongList(item, 'song')">添加歌曲</Button>
+                          <Button @click="initSongList(item, 'song')" type="warning">添加歌曲</Button>
                           <a :href="`${item.songUrl}0${item.songUrlType}`" target="_blank">查看示例链接</a>
                         </div>
                       </div>
@@ -75,13 +84,14 @@
                         <div class="fl">
                           <Input
                             v-model="item.artistValue"
+                            @keyup.enter.native="initSongList(item, 'artist')"
                           >
                             <span slot="prepend">{{ item.artistUrl }}</span>
                             <span slot="append" v-if="item.artistUrlType !== ''">{{ item.artistUrlType }}</span>
                           </Input>
                         </div>
                         <div class="fr clearfix">
-                          <Button @click="initSongList(item, 'artist')">添加歌曲</Button>
+                          <Button @click="initSongList(item, 'artist')" type="warning">添加歌曲</Button>
                           <a :href="`${item.artistUrl}0${item.artistUrlType}`" target="_blank">查看示例链接</a>
                         </div>
                       </div>
@@ -92,30 +102,48 @@
                         <div class="fl">
                           <Input
                             v-model="item.searchValue"
+                            @keyup.enter.native="initSongList(item, 'search')"
                           >
                             <span slot="prepend">{{ item.title }}</span>
                           </Input>
                         </div>
                         <div class="fr clearfix" style="width: 190px">
-                          <Button @click="initSongList(item, 'search')" long>搜索歌曲</Button>
+                          <Button @click="initSongList(item, 'search')" type="warning" long>搜索歌曲</Button>
                         </div>
                       </div>
                       <div v-else>该平台暂不支持此方式添加</div>
                     </div>
                   </div>
                 </div>
-                <div class="song-list-footer">
-                  <ul>
-                    <li
-                      v-for="(item, index) in addSongListData"
-                      :key="index"
-                    >
-                      <Checkbox
-                        v-model="item.flag"
-                        @on-change="selectSong(item, index)"
-                      ><b>{{ item.title }}</b> - {{ item.author }}</Checkbox>
-                    </li>
-                  </ul>
+                <div class="song-list-footer" v-if="addSongListData.length > 0">
+                  <div class="fl">
+                    <h3>搜索结果：</h3>
+                    <ul>
+                      <li
+                        v-for="(item, index) in addSongListData"
+                        :key="index"
+                      >
+                        <Checkbox
+                          v-model="item.flag"
+                          @on-change="selectSong(item, index)"
+                        ><b>{{ item.title }}</b> - {{ item.author }}</Checkbox>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="fr">
+                    <h3>已选歌曲：</h3>
+                    <ul>
+                      <li
+                        v-for="(item, index) in selectSongList"
+                        :key="index"
+                      >
+                        <span><b>{{ item.title }}</b> - {{ item.author }}</span>
+                        <div class="close" @click="deleteSong(item)">
+                          <Icon type="ios-close" size="22" />
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>
@@ -130,7 +158,7 @@
         </div>
       </div>
     </div>
-    <div v-else class="home-player">
+    <div v-if="!newChannel"  class="home-player">
       <div class="clearfix home-player-info">
         <div class="fl title clearfix">
           <Icon
@@ -160,11 +188,11 @@
                   <i class="iconfont icon-gecishezhi_"></i>歌词
                 </a>
               </li>
-              <!-- <li :class="aplayListFlag ? 'on' : ''">
+              <li :class="aplayListFlag ? 'on' : ''">
                 <a href="javascript:;"  @click="aplayListShowFlag">
                   <i class="iconfont icon-jiarugedan"></i>已选歌单
                 </a>
-              </li> -->
+              </li>
             </ul>
           </div>
         </div>
@@ -176,14 +204,16 @@
           :destroy="homeSignOut"
           :pause="pauseFlag"
           :playList="songList"
+          :listAdd="listAdd"
+          :deleteIndex="deleteIndex"
           ref="aplayer"
         ></tomu-aplayer>
       </div>
       <div class="home-tomu-handle">
         <ul>
           <li>
-            <a href="javascript:;"  @click="aplayListShowFlag">
-              <Icon type="md-list" /><span class="SentyPea">歌单</span>
+            <a href="javascript:;"  @click="addSong">
+              <Icon type="md-add-circle" /><span class="SentyPea">添加歌曲</span>
             </a>
           </li>
           <li>
@@ -223,13 +253,16 @@ export default {
     return {
       aplayListFlag: false,
       lrcFlag: true,
-      newChannelFlag: true,
       addClass: '',
       musicPlatform: [],
       ins: 0,
       addSongList: [],
       thisPlayerInfo: {},
-      pauseFlag: false
+      pauseFlag: false,
+      continueAddSong: false,
+      selectSongList: [],
+      listAdd: [],
+      deleteIndex: null
     }
   },
   components: {
@@ -239,7 +272,8 @@ export default {
     ...mapState([
       'homeSignOut',
       'newChannel',
-      'songList'
+      'songList',
+      'addFlag'
     ]),
     musicPlatformData: {
       get () {
@@ -260,18 +294,22 @@ export default {
   },
   methods: {
     ...mapMutations([
-      'setSongList'
+      'setSongList',
+      'setChannelFlag',
+      'setAddFlag'
     ]),
     /*
     * 初始化
     * */
     initHome () {
+      // 赋值切换类型
+      this.musicPlatformData = config.musicPlatform
       if (this.songList.length === 0 && this.newChannel) {
-        this.newChannelFlag = true
-        // 赋值切换类型
-        this.musicPlatformData = config.musicPlatform
+        this.setAddFlag(true)
       } else {
-        this.newChannelFlag = false
+        this.addSongList = this.$store2[config.storageType]('vuex').songList
+        this.selectSongList = this.$store2[config.storageType]('vuex').songList
+        this.setAddFlag(false)
       }
     },
     /*
@@ -290,6 +328,7 @@ export default {
     * 初始化列表
     * */
     async initSongList (options, type) {
+      this.$Spin.show();
       const {
         addSongListData
       } = this
@@ -299,6 +338,7 @@ export default {
         type,
         id
       })
+      this.$Spin.hide();
       const data = addSongData(addSongListData, songListData, options.type)
       this.addSongListData = data
     },
@@ -307,16 +347,45 @@ export default {
     * */
     selectSong (data, index) {
       this.addSongListData[index].flag = data.flag
+      if (data.flag) {
+        const hasData = this.selectSongList.find(item => JSON.stringify(item) === JSON.stringify(data))
+        if (hasData === undefined) {
+          this.selectSongList.push(data)
+        }
+      }
+      if (this.continueAddSong && !data.flag) {
+        if (this.thisPlayerInfo.url === data.url) {
+          this.$Message.warning('请不要移除正在播放的歌曲')
+        } else {
+          const getIndex = this.selectSongList.findIndex(item => item.url === data.url)
+          this.deleteIndex = getIndex
+          this.deleteSong(data)
+        }
+      }
+    },
+    /*
+    * 移除歌曲
+    * */
+    deleteSong (data) {
+      if (this.thisPlayerInfo.url === data.url) {
+        this.$Message.warning('请不要移除正在播放的歌曲')
+      } else {
+        const indexOf = this.selectSongList.findIndex(item => item.url === data.url)
+        this.selectSongList.splice(indexOf, 1)
+        const searchListIndex = this.addSongListData.findIndex(item => item.url === data.url)
+        this.addSongListData[searchListIndex].flag = false
+        if (this.continueAddSong) {
+          this.deleteIndex = indexOf
+          this.setSongList(saveSongList(this.selectSongList))
+        }
+      }
     },
     /*
     * 生成已选择的歌曲列表
     * */
     generatePlaylist () {
-      let {
-        addSongListData
-      } = this
-      if (addSongListData.length > 0) {
-        this.copyRightApi(saveSongList(addSongListData))
+      if (this.selectSongList.length > 0) {
+        this.copyRightApi(saveSongList(this.selectSongList))
       } else {
         this.$Message.info('请先选择歌曲')
       }
@@ -326,8 +395,29 @@ export default {
     * */
     async copyRightApi (list) {
       // await Promise.all(Object.values(list).map((data) => this.$api.copyRightApi(data.url)))
-      this.newChannelFlag = false
+      this.setChannelFlag(false)
+      if (this.continueAddSong) {
+        this.$store2[config.storageType]('listAdd', list)
+        const getListAdd = this.$store2[config.storageType]('listAdd')
+        getListAdd.splice(0, this.songList.length)
+        this.listAdd = getListAdd
+      }
+      this.setChannelFlag()
       this.setSongList(list)
+    },
+    /*
+    * 继续添加歌曲
+    * */
+    addSong () {
+      this.continueAddSong = true
+      this.setAddFlag(true)
+    },
+    /*
+    * 关闭继续添加歌曲
+    * */
+    closeAddSong () {
+      this.continueAddSong = false
+      this.setAddFlag(false)
     },
     /*
     * 自定义播放动画所需元素
@@ -336,15 +426,31 @@ export default {
       // 获取歌曲封面
       const backgroundImage = getSongBackgroundImage('aplayer-pic')
       let picUrl = ''
-      if (this.thisPlayerInfo.songSource === 'netease' || this.songList[0].songSource === 'netease') {
+      if (
+        this.thisPlayerInfo.songSource !== undefined
+        || this.thisPlayerInfo.songSource === 'netease'
+        || this.songList[0].songSource === 'netease'
+      ) {
         let picResponseURL = await this.$api.getPicUrl(backgroundImage)
         picUrl = picResponseURL.responseURL.substring(0, picResponseURL.responseURL.length - 5)
         picUrl = `background-image: url('${picUrl}190y190');`
-      } else if (this.thisPlayerInfo.songSource === 'tencent' || this.songList[0].songSource === 'tencent') {
+      } else if (
+        this.thisPlayerInfo.songSource !== undefined
+        || this.thisPlayerInfo.songSource === 'tencent'
+        || this.songList[0].songSource === 'tencent'
+      ) {
         picUrl = `background-image: url('${backgroundImage}');`
-      } else if (this.thisPlayerInfo.songSource === 'kugou' || this.songList[0].songSource === 'kugou') {
+      } else if (
+        this.thisPlayerInfo.songSource !== undefined
+        || this.thisPlayerInfo.songSource === 'kugou'
+        || this.songList[0].songSource === 'kugou'
+      ) {
         picUrl = 'background-image: url(\'https://www.ooorq.com/image/kugou-190.png\');'
-      } else if (this.thisPlayerInfo.songSource === 'baidu' || this.songList[0].songSource === 'baidu') {
+      } else if (
+        this.thisPlayerInfo.songSource !== undefined
+        || this.thisPlayerInfo.songSource === 'baidu'
+        || this.songList[0].songSource === 'baidu'
+      ) {
         picUrl = `background-image: url('${backgroundImage}');`
       }
       // 添加高清封面
@@ -395,8 +501,12 @@ export default {
     * 显示关闭歌单
     * */
     aplayListShowFlag () {
-      this.aplayListFlag = !this.aplayListFlag
-      this.$refs.aplayer.aplayListFlag()
+      if (this.songList.length > 0) {
+        this.aplayListFlag = !this.aplayListFlag
+        this.$refs.aplayer.aplayListFlag()
+      } else {
+        this.$Message.info('请添加歌曲')
+      }
     }
   },
   mounted() {
@@ -433,15 +543,24 @@ export default {
       justify-content:center;
       display:-webkit-flex;
       .newChannel{
+        position: fixed;
+        left: 0;
+        top: 65px;
+        bottom: 65px;
+        width: 100%;
+        align-items:center;
+        justify-content:center;
+        display:-webkit-flex;
+        z-index: 10;
         .title{
           font-size: 20px;
         }
         .newChannel-handle{
           position: fixed;
           left: 0;
-          top: 0;
+          top: 65px;
+          bottom: 65px;
           width: 100%;
-          height: 100%;
           background: rgba(255,255,255,0.2);
           z-index: 99999999;
           align-items:center;
@@ -488,7 +607,7 @@ export default {
                   .form{
                     .form-handle{
                       .fl{
-                        width: 560px;
+                        width: 540px;
                         @media only screen and (max-width: 820px) and (min-width:0px) {
                           float: none;
                           display: block;
@@ -507,15 +626,54 @@ export default {
                   }
                 }
                 .song-list-footer{
-                  max-height: 300px;
-                  overflow: auto;
-                  ul li{
-                    padding: 6px 6px 6px 11px;
-                    background: #ffffff;
-                    float: left;
-                    border: 1px #d8d8d8 dashed;
-                    margin: 5px 5px 5px 0;
-                    .ivu-checkbox-inner{margin-right: 5px}
+                  .fl{
+                    width: 440px;
+                    padding-top: 10px;
+                    ul{
+                      display: block;
+                      max-height: 315px;
+                      overflow: auto;
+                      li{
+                        padding: 6px 6px 6px 11px;
+                        background: #ffffff;
+                        float: left;
+                        border: 1px #d8d8d8 dashed;
+                        margin: 5px 5px 5px 0;
+                        .ivu-checkbox-inner{margin-right: 5px}
+                      }
+                    }
+                    @media only screen and (max-width: 820px) and (min-width:0px) {
+                      width: 100%;
+                    }
+                  }
+                  .fr{
+                    width: 300px;
+                    padding-top: 10px;
+                    ul{
+                      display: block;
+                      max-height: 315px;
+                      overflow: auto;
+                      li{
+                        padding: 5px 30px 5px 5px;
+                        margin-top: 5px;
+                        position: relative;
+                        border: 1px #d8d8d8 dashed;
+                        background: #ffffff;
+                        .close{
+                          position: absolute;
+                          right: 4px;
+                          top: 0;
+                          cursor: pointer;
+                          height: 100%;
+                          align-items:center;
+                          justify-content:center;
+                          display:-webkit-flex;
+                        }
+                      }
+                    }
+                    @media only screen and (max-width: 820px) and (min-width:0px) {
+                      width: 100%;
+                    }
                   }
                 }
               }
@@ -526,11 +684,27 @@ export default {
           }
         }
       }
+      .addSong{
+        background: rgba(0,0,0,0.1) !important;
+        top: 0 !important;
+        bottom:0 !important;
+        height: 100% !important;
+        .newChannel-handle{
+          top: 0 !important;
+          bottom:0 !important;
+          height: 100% !important;
+          .music-platform{
+            background: rgba(255,255,255,1) !important;
+          }
+        }
+      }
       .home-player{
         padding: 30px 0;
         width: 800px;
         max-width: 800px;
         margin: 0 auto;
+        position: relative;
+        z-index: 9;
         @media only screen and (max-width: 820px) and (min-width:0px) {
           width: 90%;
         }

@@ -1,9 +1,14 @@
 import Axios from 'axios';
+/* import config from '@/config'
+import {
+  Message
+} from 'view-design' */
 
 /**
  * 处理请求成功后 业务内部状态
  */
 const handleServeSuccess = (res) => {
+  console.log(res)
   const { errorcode } = res.data;
   if (errorcode === 100) {
     // 业务错误

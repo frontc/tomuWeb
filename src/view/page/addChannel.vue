@@ -81,7 +81,9 @@ export default {
     /*
     * 新增频道
     * */
-    addChannel () {
+    async addChannel () {
+      /* const add = await this.$api.addChannel()
+      console.log(add) */
       this.setNewChannel()
       this.goToHome()
     },

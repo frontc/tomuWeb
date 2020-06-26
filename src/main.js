@@ -6,6 +6,7 @@ import {
   Row,
   Col,
   Message,
+  Spin,
   Dropdown,
   DropdownMenu,
   DropdownItem,
@@ -42,6 +43,7 @@ Vue.component('RadioGroup', RadioGroup);
 Vue.component('Radio', Radio);
 Vue.component('Checkbox', Checkbox);
 Vue.prototype.$Message = Message
+Vue.prototype.$Spin = Spin
 
 Vue.prototype.$api = api;
 Vue.config.productionTip = false

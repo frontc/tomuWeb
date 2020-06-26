@@ -254,6 +254,24 @@ export default {
         return [];
       },
       type: Array
+    },
+    /*
+    * 增加播放列表
+    * */
+    listAdd: {
+      default() {
+        return [];
+      },
+      type: Array
+    },
+    /*
+    * 移除歌曲
+    * */
+    deleteIndex: {
+      default() {
+        return null;
+      },
+      type: Number
     }
   },
   methods: {
@@ -302,9 +320,7 @@ export default {
         }
         this.loadPlayer([newOption])
       }
-      if (options.playList.length > 0) {
-        this.loadPlayer(options.playList)
-      }
+      this.loadPlayer(options.playList)
     },
     /*
     * 开始播放
@@ -316,7 +332,6 @@ export default {
         lrcType: this.aplayerOptions.lrcType || 3,
         storageName: 'tomu'
       }
-      if (!data.length) return
       let options = {
         ...defaultOption,
         ...this.aplayerOptions,
@@ -372,6 +387,19 @@ export default {
       if (data) {
         this.ap.pause()
       }
+    },
+    /*
+    * 增加播放列表
+    * */
+    listAdd(data) {
+      this.ap.list.add(data)
+    },
+    /*
+    * 移除歌曲
+    * */
+    deleteIndex(index) {
+      this.ap.list.hide()
+      this.ap.list.remove(index);
     }
   },
   mounted() {
