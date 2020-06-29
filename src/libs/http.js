@@ -1,23 +1,32 @@
 import Axios from 'axios';
-/* import config from '@/config'
+import $config from '@/config';
 import {
   Message
-} from 'view-design' */
+} from 'view-design';
 
 /**
  * 处理请求成功后 业务内部状态
  */
 const handleServeSuccess = (res) => {
-  console.log(res)
   const { errorcode } = res.data;
   if (errorcode === 100) {
     // 业务错误
     return Promise.reject(res);
   }
   if (res.config.geRequest != undefined && res.config.geRequest) {
-    return res.request
+    return res.request;
   }
   return res.data;
+};
+
+/**
+ * 处理请求失败后
+ */
+const handleServeError = (error) => {
+  if (error.message) {
+    Message.info(error.message);
+  }
+  return false;
 };
 
 // 创建axios实例
@@ -47,14 +56,9 @@ instance.interceptors.response.use((res) => {
   return Promise.reject(res);
 }, (error) => {
   const { response } = error;
-  if (response) {
-    // 请求已经发出, 但不在2xx的范围
-    throw error(response);
+  if (response.status !== $config.code.ok) {
+    return Promise.resolve(handleServeError(response.data));
   }
-  // 处理请求超时
-  if (error.toString().includes('timeout')) {
-    throw error('timeout!');
-  }
-  return Promise.reject(error);
+  return Promise.reject(response);
 });
 export default instance;

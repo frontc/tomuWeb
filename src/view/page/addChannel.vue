@@ -41,9 +41,8 @@
 </template>
 
 <script>
-import store2 from 'store2'
-import config from '@/config'
-import waves from '@/components/waves.vue'
+import config from '@/config';
+import waves from '@/components/waves.vue';
 import { mapMutations } from 'vuex';
 
 export default {
@@ -60,47 +59,54 @@ export default {
   methods: {
     ...mapMutations([
       'resetSystemInfo',
-      'setNewChannel'
+      'setNewChannel',
+      'setChannelIdInfo'
     ]),
     /*
     * 初始化系统基本设置
     * */
     initSystemInfo () {
-      this.resetSystemInfo()
+      this.resetSystemInfo();
     },
     /*
     * 进入频道
     * */
-    getChannel () {
+    async getChannel () {
       if (this.channelId === '') {
-        this.$Message.info('请输入频道ID')
+        this.$Message.info('请输入频道ID');
       } else {
-        this.goToHome()
+        const info = await this.$api.getChannelInfo(this.channelId);
+        if (info) {
+          this.setChannelIdInfo(info)
+          this.goToHome();
+        }
       }
     },
     /*
     * 新增频道
     * */
     async addChannel () {
-      /* const add = await this.$api.addChannel()
-      console.log(add) */
-      this.setNewChannel()
-      this.goToHome()
+      const add = await this.$api.addChannel();
+      if (add) {
+        this.setChannelIdInfo(add)
+        this.setNewChannel();
+        this.goToHome();
+      }
     },
     /*
     * 进入播放首页
     * */
     goToHome () {
-      store2[config.storageType](config.loginChannelName, true)
-      this.addClass = 'animate__zoomOut_center'
+      this.$store2[config.storageType](config.loginChannelName, true);
+      this.addClass = 'animate__zoomOut_center';
       setTimeout(() => {
-        this.$router.push(config.homePath)
-      }, 800)
+        this.$router.push(config.homePath);
+      }, 800);
     }
   },
   created() {
     // 初始化系统设置
-    this.initSystemInfo()
+    this.initSystemInfo();
   }
 }
 </script>

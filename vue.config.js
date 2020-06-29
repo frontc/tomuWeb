@@ -27,8 +27,7 @@ module.exports = {
             compress: {
               drop_debugger: true,
               drop_console: true,
-            },
-            warnings: false,
+            }
           },
           sourceMap: false,
           parallel: true,

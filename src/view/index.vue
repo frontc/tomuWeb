@@ -20,8 +20,8 @@
 </template>
 
 <script>
-import pageHeader from '@/view/components/header.vue'
-import pageFooter from '@/view/components/footer.vue'
+import pageHeader from '@/view/components/header.vue';
+import pageFooter from '@/view/components/footer.vue';
 import { mapState } from 'vuex';
 
 export default {
@@ -48,7 +48,7 @@ export default {
     * */
     homeSignOut (data) {
       if (data) {
-        this.addClass = 'animate__zoomOut_center'
+        this.addClass = 'animate__zoomOut_center';
       }
     }
   }

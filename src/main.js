@@ -12,7 +12,7 @@ import {
   DropdownItem,
   RadioGroup,
   Radio,
-  Checkbox
+  Checkbox,
 } from 'view-design';
 import store2 from 'store2'
 // APlayer
@@ -26,7 +26,7 @@ import api from './libs/apis';
 import 'view-design/dist/styles/iview.css'
 import 'animate.css/animate.css'
 
-Vue.use(VueClipboard)
+Vue.use(VueClipboard);
 
 /**
  * @description 引入依赖组件
@@ -42,24 +42,25 @@ Vue.component('DropdownItem', DropdownItem);
 Vue.component('RadioGroup', RadioGroup);
 Vue.component('Radio', Radio);
 Vue.component('Checkbox', Checkbox);
-Vue.prototype.$Message = Message
-Vue.prototype.$Spin = Spin
+
+Vue.prototype.$Message = Message;
+Vue.prototype.$Spin = Spin;
 
 Vue.prototype.$api = api;
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 
 /**
  * @description 全局应用配置
  */
-Vue.prototype.$config = config
+Vue.prototype.$config = config;
 /**
  * @description 全局localStorage, sessionStorage
  */
-Vue.prototype.$store2 = store2
+Vue.prototype.$store2 = store2;
 
 
 new Vue({
   render: h => h(App),
   store,
   router,
-}).$mount('#app')
+}).$mount('#app');

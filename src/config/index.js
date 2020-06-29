@@ -24,6 +24,10 @@ export default {
    */
   storageType: 'session',
   /**
+   * @description 设置存储token的名称
+   */
+  tokenName: 'token',
+  /**
    * @description 设置api版本
    */
   apiVersions: '/api/v1',

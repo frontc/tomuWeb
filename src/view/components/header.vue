@@ -59,10 +59,10 @@
 import {
   signOut,
   addFavorite
-} from '@/libs/util'
+} from '@/libs/util';
 import { mapMutations } from 'vuex';
-import QRCode from 'qrcodejs2'
-import config from '@/config'
+import QRCode from 'qrcodejs2';
+import config from '@/config';
 
 export default {
   name: 'pageHeader',
@@ -88,42 +88,42 @@ export default {
     * 离开
     * */
     signOut () {
-      this.setSignOut(true)
-      signOut(this.$router)
+      this.setSignOut(true);
+      signOut(this.$router);
     },
     /*
     * 加入收藏
     * */
     addFavorite () {
-      addFavorite()
+      addFavorite();
     },
     /*
     * 邀请
     * */
     invite () {
-      this.inviteFlag = !this.inviteFlag
-      this.$refs.inviteCode.innerHTML = ''
+      this.inviteFlag = !this.inviteFlag;
+      this.$refs.inviteCode.innerHTML = '';
       /* eslint-disable no-new */
       new QRCode(this.$refs.inviteCode, {
         text: this.url,
         width: 220,
         height: 220
-      })
+      });
     },
     /*
     * 关闭邀请
     * */
     closeInvite () {
-      this.inviteFlag = !this.inviteFlag
+      this.inviteFlag = !this.inviteFlag;
     },
     /*
     * 复制
     * */
     onCopy () {
-      this.$Message.success('分享链接已复制到剪切板！')
+      this.$Message.success('分享链接已复制到剪切板！');
     },
     onError () {
-      this.$Message.error('抱歉，复制失败！')
+      this.$Message.error('抱歉，复制失败！');
     }
   }
 }

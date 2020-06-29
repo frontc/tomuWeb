@@ -7,11 +7,11 @@
 </template>
 
 <script>
-import APlayer from 'aplayer'
+import APlayer from 'aplayer';
 import {
   setOptionsData,
   getPropsData
-} from '@/libs/util'
+} from '@/libs/util';
 
 export default {
   name: 'tomuAplayer',
@@ -272,6 +272,24 @@ export default {
         return null;
       },
       type: Number
+    },
+    /*
+    * 切换歌曲
+    * */
+    switchSong: {
+      default() {
+        return null;
+      },
+      type: Number
+    },
+    /*
+    * 切换时间
+    * */
+    seekTime: {
+      default() {
+        return null;
+      },
+      type: Number
     }
   },
   methods: {
@@ -279,23 +297,23 @@ export default {
     * 获取所有属性值
     * */
     getPropsData () {
-      this.aplayerOptions = (this.options === null) ? getPropsData(this.$props) : setOptionsData(this.options, this.$props)
-      if (this.aplayerOptions.auto) this.parseServerLink()
-      this.setAplayerOptions()
+      this.aplayerOptions = (this.options === null) ? getPropsData(this.$props) : setOptionsData(this.options, this.$props);
+      if (this.aplayerOptions.auto) this.parseServerLink();
+      this.setAplayerOptions();
     },
     /*
     * 自动播放时-设置播放源
     * */
     parseServerLink () {
       // 从配置文件中匹配播放源
-      let link = this.$config.serverLink
+      let link = this.$config.serverLink;
       for (let rule of link) {
-        let patt = new RegExp(rule[0])
-        let res = patt.exec(this.aplayerOptions.auto)
+        let patt = new RegExp(rule[0]);
+        let res = patt.exec(this.aplayerOptions.auto);
         if (res !== null) {
-          this.aplayerOptions.server = rule[1]
-          this.aplayerOptions.type = rule[2]
-          this.aplayerOptions.id = res[1]
+          this.aplayerOptions.server = rule[1];
+          this.aplayerOptions.type = rule[2];
+          this.aplayerOptions.id = res[1];
         }
       }
     },
@@ -303,7 +321,7 @@ export default {
     * 设置播放属性
     * */
     async setAplayerOptions () {
-      let options = this.aplayerOptions
+      let options = this.aplayerOptions;
       // 设置播放所需属性
       if (this.aplayerOptions.url && this.aplayerOptions.url != '') {
         let newOption = {
@@ -313,14 +331,14 @@ export default {
           cover: options.cover || options.pic,
           lrc: options.lrc || options.lyric || '',
           type: 'auto',
-        }
+        };
         // 如果没有设置歌词模式-自动填充歌词模式
         if (!newOption.lrc) {
-          this.aplayerOptions.lrcType = 0
+          this.aplayerOptions.lrcType = 0;
         }
-        this.loadPlayer([newOption])
+        this.loadPlayer([newOption]);
       }
-      this.loadPlayer(options.playList)
+      this.loadPlayer(options.playList);
     },
     /*
     * 开始播放
@@ -331,47 +349,56 @@ export default {
         mutex: true,
         lrcType: this.aplayerOptions.lrcType || 3,
         storageName: 'tomu'
-      }
+      };
       let options = {
         ...defaultOption,
         ...this.aplayerOptions,
-      }
+      };
       Object.keys(options).forEach((optkey) => {
         if (options[optkey] === 'true' || options[optkey] === 'false') {
           options[optkey] = (options[optkey] === 'true')
         }
-      })
-      options.container = this.$refs.aplayer
+      });
+      options.container = this.$refs.aplayer;
       /* eslint-disable no-new */
-      this.ap = new APlayer(options)
+      this.ap = new APlayer(options);
       this.ap.on('loadstart', () => {
-        this.$emit('loadstart')
+        this.$emit('loadstart');
       });
       // 播放
       this.ap.on('play', (d) => {
-        this.ap.list.hide()
-        this.$emit('play', d)
+        this.ap.list.hide();
+        this.$emit('play', d);
+        this.$emit('updateTime', this.ap.audio.currentTime);
       });
       // 暂停
       this.ap.on('pause', () => {
-        this.$emit('pause')
+        this.$emit('pause');
       });
       // error
       this.ap.on('error', (e) => {
-        this.$emit('error', e)
+        this.$emit('error', e);
+      });
+      // timeupdate
+      this.ap.on('timeupdate', () => {
+        // console.log(d)
+      });
+      // playing
+      this.ap.on('playing', () => {
+        this.$emit('updateTime', this.ap.audio.currentTime);
       });
     },
     /*
     * 显示关闭歌词
     * */
     lrcFlag () {
-      this.ap.lrc.toggle()
+      this.ap.lrc.toggle();
     },
     /*
     * 显示关闭歌单
     * */
     aplayListFlag () {
-      this.ap.list.toggle()
+      this.ap.list.toggle();
     }
   },
   watch: {
@@ -380,37 +407,48 @@ export default {
     * */
     destroy (data) {
       if (data) {
-        this.ap.pause()
+        this.ap.pause();
       }
     },
     pause (data) {
       if (data) {
-        this.ap.pause()
+        this.ap.pause();
       }
     },
     /*
     * 增加播放列表
     * */
     listAdd(data) {
-      this.ap.list.add(data)
+      this.ap.list.add(data);
     },
     /*
     * 移除歌曲
     * */
     deleteIndex(index) {
-      this.ap.list.hide()
+      this.ap.list.hide();
       this.ap.list.remove(index);
+    },
+    /*
+    * 切换歌曲
+    * */
+    switchSong(index) {
+      this.ap.list.switch(index);
+    },
+    /*
+    * 切换时间
+    * */
+    seekTime(time) {
+      this.ap.list.seek(time);
     }
   },
   mounted() {
     /*
     * 初始化
     * */
-    this.getPropsData()
+    this.getPropsData();
   }
 }
 </script>
 
 <style scoped>
-
 </style>
