@@ -2,11 +2,20 @@
 
 ## 一个随身听、一副耳机，音乐便可在你我的耳边流淌。不比说什么，因为那时我们在一起。渐渐的我们离得远了，即使耳机的线再长，也无法把我们连在一起。于是，我想把这一切搬到网上来，以网络的形式继续下去...
 
-## 环境准备
+## Development environment
 ```
 node
 npm
 yarn
+```
+## yarn install
+```
+https://yarn.bootcss.com/ 
+#install
+npm install -g yarn --registry=https://registry.npm.taobao.org
+#set source
+yarn config set registry https://registry.npm.taobao.org -g
+yarn config set sass_binary_site http://cdn.npm.taobao.org/dist/node-sass -g
 ```
 
 ## Project setup
@@ -21,9 +30,9 @@ yarn run serve
 
 ### Compiles and minifies for production
 ```
-// dev生成开发测试版本
+// dev
 yarn run build:dev
-// pro生成正式发布版本
+// pro
 yarn run build:pro
 ```
 
