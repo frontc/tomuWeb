@@ -2,6 +2,12 @@
 
 ## 一个随身听、一副耳机，音乐便可在你我的耳边流淌。不比说什么，因为那时我们在一起。渐渐的我们离得远了，即使耳机的线再长，也无法把我们连在一起。于是，我想把这一切搬到网上来，以网络的形式继续下去...
 
+## 环境准备
+```
+node
+npm
+yarn
+```
 
 ## Project setup
 ```
@@ -15,7 +21,10 @@ yarn run serve
 
 ### Compiles and minifies for production
 ```
-yarn run build
+// dev生成开发测试版本
+yarn run build:dev
+// pro生成正式发布版本
+yarn run build:pro
 ```
 
 ### Run your tests
