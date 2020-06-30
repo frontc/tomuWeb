@@ -36,6 +36,13 @@ yarn run build:dev
 yarn run build:pro
 ```
 
+### Create font
+```
+cd src
+cd fontmin
+node fontmin.js
+```
+
 ### Run your tests
 ```
 yarn run test
