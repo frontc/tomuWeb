@@ -60,7 +60,8 @@ export default {
     ...mapMutations([
       'resetSystemInfo',
       'setNewChannel',
-      'setChannelIdInfo'
+      'setChannelIdInfo',
+      'setFirstEntry'
     ]),
     /*
     * 初始化系统基本设置
@@ -82,7 +83,8 @@ export default {
           // 新建频道
           const info = await this.$api.getChannelInfo(this.channelId);
           if (info) {
-            this.setChannelIdInfo(info)
+            this.setChannelIdInfo(info);
+            this.setFirstEntry(true);
             this.goToHome();
           }
         }

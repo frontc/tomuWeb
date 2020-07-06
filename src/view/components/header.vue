@@ -105,15 +105,20 @@ export default {
     /*
     * 邀请
     * */
-    invite () {
-      this.inviteFlag = !this.inviteFlag;
-      this.$refs.inviteCode.innerHTML = '';
-      /* eslint-disable no-new */
-      new QRCode(this.$refs.inviteCode, {
-        text: this.url,
-        width: 220,
-        height: 220
-      });
+    async invite () {
+      const user = await this.$api.getAudienceList(this.channelIdInfo.channelID);
+      if (user && user.length == 2) {
+        this.$Message.warning('抱歉，当前频道人员已满。')
+      } else {
+        this.inviteFlag = !this.inviteFlag;
+        this.$refs.inviteCode.innerHTML = '';
+        /* eslint-disable no-new */
+        new QRCode(this.$refs.inviteCode, {
+          text: this.url,
+          width: 220,
+          height: 220
+        });
+      }
     },
     /*
     * 关闭邀请

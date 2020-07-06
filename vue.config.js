@@ -13,7 +13,7 @@ const buildOutputDir = (name = 'dist') => {
     production: 'P', // 正式服
   };
   const versionTag = `${envTag[process.env.ENV]}_${localStr}`;
-  return process.env.ENV === 'development' ?  `${name}(${versionTag})` : 'build';
+  return process.env.ENV === 'development' ? `${name}(${versionTag})` : 'build';
 };
 module.exports = {
   publicPath: './',

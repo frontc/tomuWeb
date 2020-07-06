@@ -8,6 +8,7 @@
 
 <script>
 import APlayer from 'aplayer';
+import { mapState, mapMutations } from 'vuex';
 import {
   setOptionsData,
   getPropsData
@@ -294,7 +295,15 @@ export default {
       type: Number
     }
   },
+  computed: {
+    ...mapState([
+      'firstEntry'
+    ])
+  },
   methods: {
+    ...mapMutations([
+      'setFirstEntry'
+    ]),
     /*
     * 获取所有属性值
     * */
@@ -373,7 +382,7 @@ export default {
       this.ap.on('play', (d) => {
         this.ap.list.hide();
         this.$emit('play', d);
-        if (!this.seekTimeFlag) {
+        if (!this.seekTimeFlag && !this.firstEntry) {
           this.$emit('updateTime', this.ap.audio.currentTime);
         }
       });
@@ -387,6 +396,7 @@ export default {
       });
       // playing
       this.ap.on('playing', () => {
+        this.setFirstEntry(false);
         if (!this.seekTimeFlag) {
           this.$emit('updateTime', this.ap.audio.currentTime);
         }
@@ -437,7 +447,11 @@ export default {
     * */
     switchSong(index) {
       this.seekTimeFlag = true;
-      this.ap.play();
+      try {
+        this.ap.play();
+      } catch (e) {
+        this.$Message.info('自动播放失败，请先点击播放。')
+      }
       this.ap.list.switch(index);
     },
     /*
@@ -445,7 +459,11 @@ export default {
     * */
     seekTime(time) {
       this.seekTimeFlag = true;
-      this.ap.play();
+      try {
+        this.ap.play();
+      } catch (e) {
+        this.$Message.info('自动播放失败，请先点击播放。')
+      }
       this.ap.seek(time);
       setTimeout(() => {
         this.seekTimeFlag = false

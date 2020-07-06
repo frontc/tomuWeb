@@ -217,7 +217,7 @@ export default {
       'newChannel',
       'songList',
       'addFlag',
-      'channelIdInfo'
+      'channelIdInfo',
     ]),
     musicPlatformData: {
       get () {

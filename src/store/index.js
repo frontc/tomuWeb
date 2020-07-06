@@ -12,6 +12,7 @@ export default new Vuex.Store({
     songList: [], // 歌曲列表
     addFlag: false,
     channelIdInfo: null,
+    firstEntry: false
   },
   mutations: {
     /*
@@ -62,6 +63,12 @@ export default new Vuex.Store({
     * */
     setChannelIdInfo (state, info) {
       state.channelIdInfo = info;
+    },
+    /*
+    * 设置被邀请首次进入
+    * */
+    setFirstEntry (state, info) {
+      state.firstEntry = info;
     }
   },
   plugins: [createPersistedState({
