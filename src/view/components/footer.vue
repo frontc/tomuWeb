@@ -1,12 +1,19 @@
 <template>
 <div class="footer SentyPea">
-  Copyright @ 2011-2020 ToMu All Rights Reserved.
+  Copyright @ 2011-2020 ToMu- {{ versions }} All Rights Reserved.
 </div>
 </template>
 
 <script>
+import config from '@/config';
+
 export default {
-  name: 'pageFooter'
+  name: 'pageFooter',
+  data () {
+    return {
+      versions: config.versions
+    }
+  }
 }
 </script>
 

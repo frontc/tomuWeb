@@ -4,12 +4,16 @@ export default {
    */
   url: {
     production: 'https://tomu.orous.cn/#/',
-    development: 'http://172.17.28.91:8080/#/'
+    development: 'http://localhost:8080/#/'
   },
   /**
    * @description 网站名称
    */
   title: 'ToMu',
+  /**
+   * @description 网站发布版本
+   */
+  versions: '0.0.5',
   /**
    * @description 首页入口名称
    */

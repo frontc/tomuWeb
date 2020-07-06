@@ -453,6 +453,9 @@ export default {
         this.$Message.info('自动播放失败，请先点击播放。')
       }
       this.ap.list.switch(index);
+      setTimeout(() => {
+        this.seekTimeFlag = false
+      }, 1000)
     },
     /*
     * 切换时间
