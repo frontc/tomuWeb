@@ -34,7 +34,7 @@
           </Col>
         </Row>
       </div>
-      <div class="copy-right SentyPea">Copyright @ 2011-2020 ToMu All Rights Reserved.</div>
+      <div class="copy-right SentyPea">Copyright @ 2011-2020 ToMu-{{ versions }} All Rights Reserved.</div>
     </div>
   </div>
 </div>
@@ -50,7 +50,8 @@ export default {
   data () {
     return {
       channelId: '',
-      addClass: ''
+      addClass: '',
+      versions: config.versions
     }
   },
   components: {
