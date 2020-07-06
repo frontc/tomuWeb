@@ -19,7 +19,9 @@ export default {
     return {
       aplayerOptions: {},
       api: '',
-      ap: '' // 播放器句柄
+      ap: '', // 播放器句柄
+      seekTimeFlag: false,
+      songList: []
     }
   },
   props: {
@@ -99,7 +101,7 @@ export default {
     * */
     autoplay: {
       default() {
-        return false;
+        return true;
       },
       type: Boolean
     },
@@ -338,7 +340,9 @@ export default {
         }
         this.loadPlayer([newOption]);
       }
-      this.loadPlayer(options.playList);
+      if (options.playList.length > 0) {
+        this.loadPlayer(options.playList);
+      }
     },
     /*
     * 开始播放
@@ -369,7 +373,9 @@ export default {
       this.ap.on('play', (d) => {
         this.ap.list.hide();
         this.$emit('play', d);
-        this.$emit('updateTime', this.ap.audio.currentTime);
+        if (!this.seekTimeFlag) {
+          this.$emit('updateTime', this.ap.audio.currentTime);
+        }
       });
       // 暂停
       this.ap.on('pause', () => {
@@ -379,13 +385,11 @@ export default {
       this.ap.on('error', (e) => {
         this.$emit('error', e);
       });
-      // timeupdate
-      this.ap.on('timeupdate', () => {
-        // console.log(d)
-      });
       // playing
       this.ap.on('playing', () => {
-        this.$emit('updateTime', this.ap.audio.currentTime);
+        if (!this.seekTimeFlag) {
+          this.$emit('updateTime', this.ap.audio.currentTime);
+        }
       });
     },
     /*
@@ -432,13 +436,29 @@ export default {
     * 切换歌曲
     * */
     switchSong(index) {
+      this.seekTimeFlag = true;
+      this.ap.play();
       this.ap.list.switch(index);
     },
     /*
     * 切换时间
     * */
     seekTime(time) {
-      this.ap.list.seek(time);
+      this.seekTimeFlag = true;
+      this.ap.play();
+      this.ap.seek(time);
+      setTimeout(() => {
+        this.seekTimeFlag = false
+      }, 1000)
+    },
+    /*
+    * 列表
+    * */
+    playList (data) {
+      if (this.songList.length === 0) {
+        this.songList = data;
+        this.loadPlayer(data)
+      }
     }
   },
   mounted() {

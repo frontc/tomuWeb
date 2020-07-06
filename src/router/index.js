@@ -36,6 +36,16 @@ const routes = [
       title: 'ToMu',
     },
     component: () => import('@/view/page/addChannel.vue'),
+    children: [
+      {
+        path: `/${config.addChannelPath}/:id`,
+        name: 'params',
+        meta: {
+          title: 'ToMu',
+        },
+        component: () => import('@/view/page/addChannel.vue'),
+      }
+    ]
   },
   /* 404 配置 */
   {
@@ -54,7 +64,7 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   LoadingBar.start();
   const token = getToMuLoginChanneFlag();
-  if (!token && to.name !== config.addChannelPath) {
+  if (!token && to.name !== config.addChannelPath && to.name !== 'params') {
     // 未登录且要跳转的页面不是登录页
     Message.info('请先添加频道');
     next({

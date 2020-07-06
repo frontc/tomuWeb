@@ -2,7 +2,10 @@ export default {
   /**
    * @description 网站域名
    */
-  url: 'http://www.tomu.com',
+  url: {
+    production: 'https://tomu.orous.cn/#/',
+    development: 'http://172.17.28.91:8080/#/'
+  },
   /**
    * @description 网站名称
    */

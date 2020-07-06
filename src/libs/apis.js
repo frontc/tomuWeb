@@ -1,12 +1,14 @@
 import qs from 'qs';
 import axios from '@/libs/http';
-import { getToken } from '@/libs/util'
+import {
+  getToken
+} from '@/libs/util'
 import config from '@/config';
 
 const AuthorizationToken = () => ({
   headers: {
     common: {
-      Authorization: getToken()
+      Authorization: `Bearer ${getToken()}`,
     }
   }, // Authorization
 });
@@ -25,13 +27,17 @@ export default {
       baseURL: config.songListApi
     });
   },
+  // 获取token
+  getAuthKey () {
+    return axios.get(`${config.apiVersions}/auth`);
+  },
   // 新建频道
   addChannel() {
-    return axios.post(`${config.apiVersions}/channel`);
+    return axios.post(`${config.apiVersions}/channel`, null, AuthorizationToken());
   },
   // 获取频道信息
   getChannelInfo (channelID) {
-    return axios.get(`${config.apiVersions}/channel/${channelID}`);
+    return axios.get(`${config.apiVersions}/channel/${channelID}`, AuthorizationToken());
   },
   // 获取歌单列表
   getChannelSongs (channelID) {
@@ -39,11 +45,19 @@ export default {
   },
   // 添加歌单
   setChannelSongs (channelID, data) {
-    return axios.post(`${config.apiVersions}/channel/${channelID}/songs`, qs.stringify(data), AuthorizationToken());
+    return axios.post(`${config.apiVersions}/channel/${channelID}/song`, qs.stringify(data), AuthorizationToken());
   },
   // 上报播放状态变化
   setChannelSongsStatus (channelID, data) {
     return axios.post(`${config.apiVersions}/channel/${channelID}/status`, qs.stringify(data), AuthorizationToken());
+  },
+  // 获取频道在线用户
+  getAudienceList (channelID) {
+    return axios.get(`${config.apiVersions}/channel/${channelID}/audience`, AuthorizationToken());
+  },
+  // 获取当前用户昵称
+  getThisUserName () {
+    return axios.get(`${config.apiVersions}/who`, AuthorizationToken());
   },
   // 验证歌曲api
   copyRightApi (url) {

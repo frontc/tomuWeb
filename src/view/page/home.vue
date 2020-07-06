@@ -98,36 +98,36 @@
           <Icon
             type="ios-radio"
             size="30"
-          /><span class="SentyPea">当前频道: channel-520</span>
+          /><span class="SentyPea">当前频道: channel-{{ channelIdInfo.channelID || '获取中' }}</span>
         </div>
-        <div class="fr SentyPea">
-          <Dropdown>
-            <a href="javascript:void(0)">
-              已听2首
-              <Icon type="ios-arrow-down"></Icon>
-            </a>
-            <DropdownMenu slot="list">
-              <DropdownItem>稻香</DropdownItem>
-              <DropdownItem>青花瓷</DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
+        <div class="fr clearfix SentyPea">
+          <ul>
+            <li :class="lrcFlag ? 'on' : ''">
+              <a href="javascript:;"  @click="lrcShowFlag">
+                <i class="iconfont icon-gecishezhi_"></i>歌词
+              </a>
+            </li>
+            <li :class="aplayListFlag ? 'on' : ''">
+              <a href="javascript:;"  @click="aplayListShowFlag">
+                <i class="iconfont icon-jiarugedan"></i>已选歌单
+              </a>
+            </li>
+          </ul>
         </div>
       </div>
       <div class="tomu-aplayer">
-        <div class="tomu-aplayer-handle clearfix">
-          <div class="fr clearfix SentyPea">
-            <ul>
-              <li :class="lrcFlag ? 'on' : ''">
-                <a href="javascript:;"  @click="lrcShowFlag">
-                  <i class="iconfont icon-gecishezhi_"></i>歌词
-                </a>
-              </li>
-              <li :class="aplayListFlag ? 'on' : ''">
-                <a href="javascript:;"  @click="aplayListShowFlag">
-                  <i class="iconfont icon-jiarugedan"></i>已选歌单
-                </a>
-              </li>
-            </ul>
+        <div class="tomu-aplayer-handle clearfix" v-if="false">
+          <div class="fr SentyPea">
+            <Dropdown>
+              <a href="javascript:void(0)">
+                已听2首
+                <Icon type="ios-arrow-down"></Icon>
+              </a>
+              <DropdownMenu slot="list">
+                <DropdownItem>稻香</DropdownItem>
+                <DropdownItem>青花瓷</DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
           </div>
         </div>
         <tomu-aplayer
@@ -183,7 +183,8 @@ import {
   byClass,
   getThisPlayer,
   changeResultData,
-  changeRequestData
+  changeRequestData,
+  getToken
 } from '@/libs/util';
 
 export default {
@@ -203,7 +204,8 @@ export default {
       listAdd: [],
       deleteIndex: null,
       switchSong: null,
-      seekTime: null
+      seekTime: null,
+      songs: []
     }
   },
   components: {
@@ -243,7 +245,9 @@ export default {
     async getChannelSongs () {
       const songs = await this.$api.getChannelSongs(this.channelIdInfo.channelID);
       if (songs) {
-        this.setSongList(changeResultData(songs))
+        if (songs.data.length > 0) {
+          this.setSongList(changeResultData(songs.data))
+        }
         // 初始化
         this.initHome();
         // 初始化监听
@@ -341,7 +345,6 @@ export default {
     * */
     async copyRightApi (list) {
       // await Promise.all(Object.values(list).map((data) => this.$api.copyRightApi(data.url)))
-      this.setChannelFlag(false);
       if (this.continueAddSong) {
         // 是否是再次添加歌曲
         this.$store2[config.storageType]('listAdd', list);
@@ -353,19 +356,21 @@ export default {
         await Promise.all(Object.values(channelSongsList).map((data) => this.$api.setChannelSongs(this.channelIdInfo.channelID, data)));
         const songs = await this.$api.getChannelSongs(this.channelIdInfo.channelID);
         if (songs) {
-          const resultData = changeResultData(songs);
+          const resultData = changeResultData(songs.data);
           resultData.splice(0, this.songList.length);
           this.listAdd = resultData;
+          const newSongs = await this.$api.getChannelSongs(this.channelIdInfo.channelID);
+          if (newSongs) {
+            this.setChannelFlag();
+            this.setSongList(changeResultData(newSongs.data))
+          }
         }
       } else {
         // 是否首次添加歌曲
         const channelSongsList = changeRequestData(list)
-        await Promise.all(Object.values(channelSongsList).map((data) => this.$api.setChannelSongs(this.channelIdInfo.channelID, data)));
-      }
-      const songs = await this.$api.getChannelSongs(this.channelIdInfo.channelID);
-      if (songs) {
+        const dataList = await Promise.all(Object.values(channelSongsList).map((data) => this.$api.setChannelSongs(this.channelIdInfo.channelID, data)));
         this.setChannelFlag();
-        this.setSongList(changeResultData(songs))
+        this.setSongList(changeResultData(dataList))
       }
     },
     /*
@@ -479,16 +484,20 @@ export default {
     /*
     * 监听频道状态
     * */
-    listenChannelStatus () {
-      const source = new EventSource(`${process.env.VUE_APP_BASE_URL}${config.apiVersions}/channel/${this.channelIdInfo.channelID}/status`);
+    async listenChannelStatus () {
+      const source = new EventSource(`${process.env.VUE_APP_BASE_URL}${config.apiVersions}/channel/${this.channelIdInfo.channelID}/status?clientID=${getToken()}`);
+      source.addEventListener('open', () => {
+        this.$Message.info('Connected');
+      }, false);
       source.addEventListener('status', (e) => {
         let {
           data
         } = e;
-        data = JSON.parse(data)
+        this.$Message.info(data);
+        data = JSON.parse(data);
         const indexOf = this.selectSongList.findIndex(item => item.id === data.songID);
         if (indexOf !== -1) {
-          this.switchSong = indexOf
+          this.switchSong = indexOf;
           setTimeout(() => {
             this.seekTime = data.position
           }, 1000)
@@ -499,9 +508,9 @@ export default {
       }, false);
     }
   },
-  mounted() {
+  async created() {
     // 初始化频道歌单
-    this.getChannelSongs()
+    await this.getChannelSongs()
   }
 }
 </script>
@@ -702,28 +711,30 @@ export default {
               margin-right: 5px;
             }
           }
-          .fr{padding-top: 4px;}
+          .fr{
+            padding-top: 4px;
+            ul li {
+              float: left;
+              margin-left: 15px;
+              line-height: 33px;
+              a{
+                color: #666666;
+                font-size: 16px;
+                display: block;
+                i{
+                  margin-right: 6px;
+                  font-size: 22px;
+                  float: left;
+                }
+              }
+            }
+            ul li.on {
+              a{color:#0078D7 }
+            }
+          }
         }
         .tomu-aplayer-handle{
           padding: 10px 0px 0 0px;
-          ul li {
-            float: left;
-            margin-left: 15px;
-            line-height: 33px;
-            a{
-              color: #666666;
-              font-size: 16px;
-              display: block;
-              i{
-                margin-right: 6px;
-                font-size: 22px;
-                float: left;
-              }
-            }
-          }
-          ul li.on {
-            a{color:#0078D7 }
-          }
         }
         /* 自定义播放器样式 */
         .aplayer{

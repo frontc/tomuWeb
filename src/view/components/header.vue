@@ -60,7 +60,7 @@ import {
   signOut,
   addFavorite
 } from '@/libs/util';
-import { mapMutations } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 import QRCode from 'qrcodejs2';
 import config from '@/config';
 
@@ -69,7 +69,7 @@ export default {
   data () {
     return {
       inviteFlag: false,
-      url: config.url
+      url: ''
     }
   },
   props: {
@@ -79,6 +79,11 @@ export default {
       },
       type: Boolean
     }
+  },
+  computed: {
+    ...mapState([
+      'channelIdInfo'
+    ])
   },
   methods: {
     ...mapMutations([
@@ -125,6 +130,9 @@ export default {
     onError () {
       this.$Message.error('抱歉，复制失败！');
     }
+  },
+  mounted() {
+    this.url = `${config.url[process.env.NODE_ENV]}${config.addChannelPath}/${this.channelIdInfo.channelID}`
   }
 }
 </script>

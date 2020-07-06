@@ -28,7 +28,7 @@ export default new Vuex.Store({
       state.homeSignOut = false;
       state.addFlag = false;
       state.songList = [];
-      state.channelID = null;
+      state.channelIdInfo = null;
     },
     /*
     * 新建频道

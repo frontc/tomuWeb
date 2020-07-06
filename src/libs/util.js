@@ -233,6 +233,6 @@ export const changeRequestData = (data) => {
 };
 
 /**
- * @description 转换添加歌曲参数
+ * @description 设置token
  */
 export const getToken = () => store2[config.storageType](config.tokenName);

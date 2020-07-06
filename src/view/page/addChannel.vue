@@ -75,10 +75,16 @@ export default {
       if (this.channelId === '') {
         this.$Message.info('请输入频道ID');
       } else {
-        const info = await this.$api.getChannelInfo(this.channelId);
-        if (info) {
-          this.setChannelIdInfo(info)
-          this.goToHome();
+        // 获取令牌
+        const auth = await this.$api.getAuthKey();
+        if (auth) {
+          this.$store2[config.storageType](config.tokenName, auth);
+          // 新建频道
+          const info = await this.$api.getChannelInfo(this.channelId);
+          if (info) {
+            this.setChannelIdInfo(info)
+            this.goToHome();
+          }
         }
       }
     },
@@ -86,11 +92,17 @@ export default {
     * 新增频道
     * */
     async addChannel () {
-      const add = await this.$api.addChannel();
-      if (add) {
-        this.setChannelIdInfo(add)
-        this.setNewChannel();
-        this.goToHome();
+      // 获取令牌
+      const auth = await this.$api.getAuthKey();
+      if (auth) {
+        this.$store2[config.storageType](config.tokenName, auth);
+        // 新建频道
+        const add = await this.$api.addChannel();
+        if (add) {
+          this.setChannelIdInfo(add)
+          this.setNewChannel();
+          this.goToHome();
+        }
       }
     },
     /*
@@ -100,11 +112,25 @@ export default {
       this.$store2[config.storageType](config.loginChannelName, true);
       this.addClass = 'animate__zoomOut_center';
       setTimeout(() => {
-        this.$router.push(config.homePath);
+        this.$router.push(`/${config.homePath}`);
       }, 800);
     }
   },
+  watch: {
+    $route (router) {
+      // 获取频道ID
+      this.channelId = router.params.id || '';
+      if (this.channelId !== '') {
+        this.getChannel()
+      }
+    }
+  },
   created() {
+    // 获取频道ID
+    this.channelId = this.$route.params.id || '';
+    if (this.channelId !== '') {
+      this.getChannel()
+    }
     // 初始化系统设置
     this.initSystemInfo();
   }

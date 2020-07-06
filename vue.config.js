@@ -13,7 +13,7 @@ const buildOutputDir = (name = 'dist') => {
     production: 'P', // 正式服
   };
   const versionTag = `${envTag[process.env.ENV]}_${localStr}`;
-  return `${name}(${versionTag})`;
+  return process.env.ENV === 'development' ?  `${name}(${versionTag})` : 'build';
 };
 module.exports = {
   publicPath: './',
@@ -35,7 +35,19 @@ module.exports = {
       );
     }
   },
-
+  devServer: {
+    proxy: { // 配置跨域
+      '/api': {
+        //要访问的跨域的api的域名
+        target: 'http://localhost:8888',
+        ws: false,
+        changOrigin: true,
+        pathRewrite: {
+          '^/api': ''
+        }
+      }
+    }
+  },
   pluginOptions: {
     'style-resources-loader': {
       preProcessor: 'less',
