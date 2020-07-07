@@ -18,6 +18,7 @@ import store2 from 'store2'
 // APlayer
 import 'aplayer/dist/APlayer.min.css'
 import VueClipboard from 'vue-clipboard2'
+import { NativeEventSource, EventSourcePolyfill } from 'event-source-polyfill';
 import App from './App.vue'
 import router from './router'
 import store from './store'
@@ -53,6 +54,11 @@ Vue.config.productionTip = false;
  * @description 全局应用配置
  */
 Vue.prototype.$config = config;
+/**
+ * @description 全局event-source-polyfill
+ */
+Vue.prototype.$NativeEventSource = NativeEventSource;
+Vue.prototype.$EventSourcePolyfill = EventSourcePolyfill;
 /**
  * @description 全局localStorage, sessionStorage
  */

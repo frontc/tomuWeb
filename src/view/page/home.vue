@@ -503,7 +503,7 @@ export default {
     * 监听频道状态
     * */
     async listenChannelStatus () {
-      const source = new EventSource(`${process.env.VUE_APP_BASE_URL}${config.apiVersions}/channel/${this.channelIdInfo.channelID}/status?clientID=${getToken()}`);
+      const source = new this.$EventSourcePolyfill(`${process.env.VUE_APP_BASE_URL}${config.apiVersions}/channel/${this.channelIdInfo.channelID}/status?clientID=${getToken()}`);
       source.addEventListener('open', () => {
         this.$Message.info('Connected');
       }, false);
@@ -521,8 +521,9 @@ export default {
           }, 1000)
         }
       }, false);
-      source.addEventListener('pause', () => {
+      source.addEventListener('error', () => {
         source.close();
+        this.listenChannelStatus();
       }, false);
     }
   },
