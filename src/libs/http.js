@@ -40,6 +40,7 @@ instance.defaults.baseURL = process.env.VUE_APP_BASE_URL;
 // 设置请求头
 instance.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 instance.defaults.headers.get['Content-Type'] = 'application/json';
+instance.defaults.headers.delete['Content-Type'] = 'application/json';
 /**
  * 请求拦截器
  */
@@ -56,7 +57,7 @@ instance.interceptors.response.use((res) => {
   return Promise.reject(res);
 }, (error) => {
   const { response } = error;
-  if (response.status !== $config.code.ok) {
+  if (response.status !== undefined && response.status !== $config.code.ok) {
     return Promise.resolve(handleServeError(response.data));
   }
   return Promise.reject(response);

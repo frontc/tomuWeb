@@ -160,7 +160,7 @@
           </li>
           <li>
             <a href="javascript:;">
-              <Icon type="md-search" /><span class="SentyPea">搜索</span>
+              <Icon type="md-search"/><span class="SentyPea">搜索</span>
             </a>
           </li>
         </ul>
@@ -243,10 +243,10 @@ export default {
       'setAddFlag'
     ]),
     async getChannelSongs () {
-      const songs = await this.$api.getChannelSongs(this.channelIdInfo.channelID);
+      const songs = await this.$api.getChannelSongsAll(this.channelIdInfo.channelID);
       if (songs) {
-        if (songs.data.length > 0) {
-          this.setSongList(changeResultData(songs.data))
+        if (songs.length > 0) {
+          this.setSongList(changeResultData(songs))
         }
         // 初始化
         this.initHome();
@@ -318,16 +318,22 @@ export default {
     /*
     * 移除歌曲
     * */
-    deleteSong (data) {
+    async deleteSong (data) {
       if (this.thisPlayerInfo.url === data.url) {
         this.$Message.warning('请不要移除正在播放的歌曲');
-      } else {
+      } else if (this.continueAddSong) {
+        const indexOf = this.selectSongList.findIndex(item => item.url === data.url);
+        if (indexOf !== -1 && this.selectSongList[indexOf].id != undefined) {
+          await this.$api.deleteChannelSongs(this.channelIdInfo.channelID, this.selectSongList[indexOf].id);
+          this.deleteIndex = indexOf;
+          this.selectSongList.splice(indexOf, 1);
+          this.setSongList(saveSongList(this.selectSongList));
+        } else {
+          this.selectSongList.splice(indexOf, 1);
+        }
+      } else if (!this.continueAddSong) {
         const indexOf = this.selectSongList.findIndex(item => item.url === data.url);
         this.selectSongList.splice(indexOf, 1);
-        if (this.continueAddSong) {
-          this.deleteIndex = indexOf;
-          this.setSongList(saveSongList(this.selectSongList));
-        }
       }
     },
     /*
@@ -343,8 +349,14 @@ export default {
     /*
     * 验证歌曲版权
     * */
-    async copyRightApi (list) {
+    copyRightApi (list) {
       // await Promise.all(Object.values(list).map((data) => this.$api.copyRightApi(data.url)))
+      this.addSongsAll(list);
+    },
+    /*
+    * 添加全部歌曲
+    * */
+    async addSongsAll (list) {
       if (this.continueAddSong) {
         // 是否是再次添加歌曲
         this.$store2[config.storageType]('listAdd', list);
@@ -354,23 +366,29 @@ export default {
         }
         const channelSongsList = changeRequestData(getListAdd)
         await Promise.all(Object.values(channelSongsList).map((data) => this.$api.setChannelSongs(this.channelIdInfo.channelID, data)));
-        const songs = await this.$api.getChannelSongs(this.channelIdInfo.channelID);
+        const songs = await this.$api.getChannelSongsAll(this.channelIdInfo.channelID);
         if (songs) {
-          const resultData = changeResultData(songs.data);
+          const resultData = changeResultData(songs);
           resultData.splice(0, this.songList.length);
           this.listAdd = resultData;
-          const newSongs = await this.$api.getChannelSongs(this.channelIdInfo.channelID);
-          if (newSongs) {
-            this.setChannelFlag();
-            this.setSongList(changeResultData(newSongs.data))
-          }
+          this.saveSongsAll();
         }
       } else {
         // 是否首次添加歌曲
         const channelSongsList = changeRequestData(list)
-        const dataList = await Promise.all(Object.values(channelSongsList).map((data) => this.$api.setChannelSongs(this.channelIdInfo.channelID, data)));
+        await Promise.all(Object.values(channelSongsList).map((data) => this.$api.setChannelSongs(this.channelIdInfo.channelID, data)));
+        this.saveSongsAll();
+      }
+    },
+    /*
+    * 保存全部歌曲
+    * */
+    async saveSongsAll () {
+      const newSongs = await this.$api.getChannelSongsAll(this.channelIdInfo.channelID);
+      if (newSongs) {
         this.setChannelFlag();
-        this.setSongList(changeResultData(dataList))
+        this.setSongList(changeResultData(newSongs));
+        this.selectSongList = this.$store2[config.storageType]('vuex').songList;
       }
     },
     /*
@@ -495,7 +513,7 @@ export default {
         } = e;
         this.$Message.info(data);
         data = JSON.parse(data);
-        const indexOf = this.selectSongList.findIndex(item => item.id === data.songID);
+        const indexOf = this.songList.findIndex(item => item.id === data.songID);
         if (indexOf !== -1) {
           this.switchSong = indexOf;
           setTimeout(() => {

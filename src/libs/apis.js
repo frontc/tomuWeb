@@ -43,9 +43,17 @@ export default {
   getChannelSongs (channelID) {
     return axios.get(`${config.apiVersions}/channel/${channelID}/songs`, AuthorizationToken());
   },
+  // 获取全部歌单列表
+  getChannelSongsAll (channelID) {
+    return axios.get(`${config.apiVersions}/channel/${channelID}/songs/all`, AuthorizationToken());
+  },
   // 添加歌单
   setChannelSongs (channelID, data) {
     return axios.post(`${config.apiVersions}/channel/${channelID}/song`, qs.stringify(data), AuthorizationToken());
+  },
+  // 从频道删除歌曲
+  deleteChannelSongs (channelID, songID) {
+    return axios.delete(`${config.apiVersions}/channel/${channelID}/song/${songID}`, AuthorizationToken());
   },
   // 上报播放状态变化
   setChannelSongsStatus (channelID, data) {
@@ -58,6 +66,10 @@ export default {
   // 获取当前用户昵称
   getThisUserName () {
     return axios.get(`${config.apiVersions}/who`, AuthorizationToken());
+  },
+  // 用户从频道退出
+  signOutChannel (channelID) {
+    return axios.delete(`${config.apiVersions}/channel/${channelID}/audience`, AuthorizationToken());
   },
   // 验证歌曲api
   copyRightApi (url) {

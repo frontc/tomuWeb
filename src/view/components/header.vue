@@ -92,9 +92,13 @@ export default {
     /*
     * 离开
     * */
-    signOut () {
-      this.setSignOut(true);
-      signOut(this.$router);
+    async signOut () {
+      const out = await this.$api.signOutChannel(this.channelIdInfo.channelID);
+      if (out) {
+        this.$Message.info('频道退出成功');
+        this.setSignOut(true);
+        signOut(this.$router);
+      }
     },
     /*
     * 加入收藏
@@ -137,7 +141,7 @@ export default {
     }
   },
   mounted() {
-    this.url = `${config.url[process.env.NODE_ENV]}${config.addChannelPath}/${this.channelIdInfo.channelID}`
+    this.url = `${config.url[process.env.NODE_ENV]}${config.addChannelPath}/${this.channelIdInfo.channelID}`;
   }
 }
 </script>

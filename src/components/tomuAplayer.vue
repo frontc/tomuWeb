@@ -378,13 +378,15 @@ export default {
       this.ap.on('loadstart', () => {
         this.$emit('loadstart');
       });
-      // 播放
-      this.ap.on('play', (d) => {
+      // playing
+      this.ap.on('playing', (d) => {
         this.ap.list.hide();
         this.$emit('play', d);
         if (!this.seekTimeFlag && !this.firstEntry) {
           this.$emit('updateTime', this.ap.audio.currentTime);
         }
+        this.seekTimeFlag = false;
+        this.setFirstEntry(false);
       });
       // 暂停
       this.ap.on('pause', () => {
@@ -393,13 +395,6 @@ export default {
       // error
       this.ap.on('error', (e) => {
         this.$emit('error', e);
-      });
-      // playing
-      this.ap.on('playing', () => {
-        this.setFirstEntry(false);
-        if (!this.seekTimeFlag) {
-          this.$emit('updateTime', this.ap.audio.currentTime);
-        }
       });
     },
     /*
@@ -453,9 +448,6 @@ export default {
         this.$Message.info('自动播放失败，请先点击播放。')
       }
       this.ap.list.switch(index);
-      setTimeout(() => {
-        this.seekTimeFlag = false
-      }, 1000)
     },
     /*
     * 切换时间
@@ -468,9 +460,6 @@ export default {
         this.$Message.info('自动播放失败，请先点击播放。')
       }
       this.ap.seek(time);
-      setTimeout(() => {
-        this.seekTimeFlag = false
-      }, 1000)
     },
     /*
     * 列表
