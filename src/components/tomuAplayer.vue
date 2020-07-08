@@ -13,6 +13,7 @@ import {
   setOptionsData,
   getPropsData
 } from '@/libs/util';
+import config from '@/config';
 
 export default {
   name: 'tomuAplayer',
@@ -395,6 +396,9 @@ export default {
       // error
       this.ap.on('error', (e) => {
         this.$emit('error', e);
+        this.$ba.trackEvent(`${this.$store2[config.storageType]('userName')}-播放器错误`, JSON.stringify({
+          info: e
+        }));
       });
     },
     /*
