@@ -364,7 +364,7 @@ export default {
         if (this.songList.length > 0) {
           getListAdd.splice(0, this.songList.length);
         }
-        const channelSongsList = changeRequestData(getListAdd)
+        const channelSongsList = changeRequestData(getListAdd);
         await Promise.all(Object.values(channelSongsList).map((data) => this.$api.setChannelSongs(this.channelIdInfo.channelID, data)));
         const songs = await this.$api.getChannelSongsAll(this.channelIdInfo.channelID);
         if (songs) {
@@ -505,26 +505,100 @@ export default {
     async listenChannelStatus () {
       const source = new this.$EventSourcePolyfill(`${process.env.VUE_APP_BASE_URL}${config.apiVersions}/channel/${this.channelIdInfo.channelID}/status?clientID=${getToken()}`);
       source.addEventListener('open', () => {
-        this.$Message.info('Connected');
+        this.$Message.info('欢迎使用ToMu');
       }, false);
-      source.addEventListener('status', (e) => {
+      // 改变进度
+      source.addEventListener('CHANGE_PLAY_STATUS', (e) => {
         let {
           data
         } = e;
-        this.$Message.info(data);
-        data = JSON.parse(data);
-        const indexOf = this.songList.findIndex(item => item.id === data.songID);
+        const {
+          detail
+        } = JSON.parse(data);
+        const indexOf = this.songList.findIndex(item => item.id === detail.songID);
         if (indexOf !== -1) {
           this.switchSong = indexOf;
           setTimeout(() => {
-            this.seekTime = data.position
+            this.seekTime = detail.position
           }, 1000)
         }
       }, false);
+      // 退出频道
+      source.addEventListener('AUDIENCE_OUT', (e) => {
+        let {
+          data
+        } = e;
+        const {
+          detail: {
+            nickName
+          }
+        } = JSON.parse(data);
+        this.$Message.info(`${nickName}退出频道`);
+      }, false);
+      // 进入频道
+      source.addEventListener('AUDIENCE_IN', (e) => {
+        let {
+          data
+        } = e;
+        const {
+          detail: {
+            nickName
+          }
+        } = JSON.parse(data);
+        this.$Message.info(`${nickName}进入频道`);
+      }, false);
+      // 接收添加歌曲
+      source.addEventListener('ADD_SONG', (e) => {
+        let {
+          data
+        } = e;
+        const {
+          detail: {
+            channelID,
+            songView
+          }
+        } = JSON.parse(data);
+        if (channelID === this.channelIdInfo.channelID) {
+          this.listAdd = changeResultData([songView]);
+          let newSongsList = this.$store2[config.storageType]('vuex').songList;
+          newSongsList.push(changeResultData([songView])[0]);
+          this.setSongList(newSongsList);
+          this.selectSongList = this.$store2[config.storageType]('vuex').songList;
+        }
+      }, false);
+      // 移除歌曲
+      source.addEventListener('DELETE_SONG', (e) => {
+        let {
+          data
+        } = e;
+        const {
+          detail: {
+            songID
+          }
+        } = JSON.parse(data);
+        if (this.thisPlayerInfo.id === songID) {
+          this.$Message.warning('请不要移除正在播放的歌曲');
+        } else {
+          const indexOf = this.selectSongList.findIndex(item => item.id === songID);
+          if (indexOf !== -1 && this.selectSongList[indexOf].id != undefined) {
+            this.removeSong(songID);
+            this.deleteIndex = indexOf;
+            this.selectSongList.splice(indexOf, 1);
+            this.setSongList(saveSongList(this.selectSongList));
+          } else {
+            this.selectSongList.splice(indexOf, 1);
+          }
+          this.selectSongList = this.$store2[config.storageType]('vuex').songList;
+        }
+      }, false);
+      // 错误处理
       source.addEventListener('error', () => {
         source.close();
         this.listenChannelStatus();
       }, false);
+    },
+    async removeSong (songID) {
+      await this.$api.deleteChannelSongs(this.channelIdInfo.channelID, songID);
     }
   },
   async created() {
