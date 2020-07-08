@@ -1,0 +1,12 @@
+@font-face {
+    font-family: "Senty Pea 新蒂绿豆体";
+    src: url("SentyPea.eot"); /* IE9 */
+    src: url("SentyPea.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+    url("SentyPea.woff") format("woff"), /* chrome, firefox */
+    url("SentyPea.ttf") format("truetype"), /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
+    url("SentyPea.svg#Senty Pea 新蒂绿豆体") format("svg"); /* iOS 4.1- */
+    font-style: normal;
+    font-weight: normal;
+}
+
+
