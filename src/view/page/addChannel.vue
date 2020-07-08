@@ -86,6 +86,10 @@ export default {
           if (info) {
             this.setChannelIdInfo(info);
             this.setFirstEntry(true);
+            this.getUserName();
+            this.$ba.trackEvent(`${this.$store2[config.storageType]('userName')}-加入频道`, JSON.stringify({
+              info
+            }));
             this.goToHome();
           }
         }
@@ -102,7 +106,11 @@ export default {
         // 新建频道
         const add = await this.$api.addChannel();
         if (add) {
-          this.setChannelIdInfo(add)
+          this.getUserName();
+          this.$ba.trackEvent(`${this.$store2[config.storageType]('userName')}-新建频道`, JSON.stringify({
+            info: add
+          }));
+          this.setChannelIdInfo(add);
           this.setNewChannel();
           this.goToHome();
         }
@@ -117,6 +125,10 @@ export default {
       setTimeout(() => {
         this.$router.push(`/${config.homePath}`);
       }, 800);
+    },
+    async getUserName () {
+      const name = await this.$api.getThisUserName();
+      this.$store2[config.storageType]('userName', name);
     }
   },
   watch: {

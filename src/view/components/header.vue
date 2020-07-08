@@ -97,6 +97,9 @@ export default {
       if (out) {
         this.$Message.info('频道退出成功');
         this.setSignOut(true);
+        this.$ba.trackEvent(`${this.$store2[config.storageType]('userName')}-退出频道`, JSON.stringify({
+          info: '退出频道'
+        }));
         signOut(this.$router);
       }
     },
@@ -122,6 +125,9 @@ export default {
           width: 220,
           height: 220
         });
+        this.$ba.trackEvent(`${this.$store2[config.storageType]('userName')}-执行邀请操作`, JSON.stringify({
+          info: this.url
+        }));
       }
     },
     /*
@@ -135,6 +141,9 @@ export default {
     * */
     onCopy () {
       this.$Message.success('分享链接已复制到剪切板！');
+      this.$ba.trackEvent(`${this.$store2[config.storageType]('userName')}-执行邀请操作`, JSON.stringify({
+        info: this.url
+      }));
     },
     onError () {
       this.$Message.error('抱歉，复制失败！');

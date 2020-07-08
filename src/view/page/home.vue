@@ -20,7 +20,7 @@
                     v-for="(item, index) in musicPlatformData"
                     :key="index"
                     :class="{on: index === ins}"
-                    @click='tabPlatform(index, item.type)'
+                    @click='tabPlatform(index, item.title)'
                   >
                     <a href="javascript:;"><img :src='item.logo'/></a>
                   </li>
@@ -253,7 +253,10 @@ export default {
         // 初始化监听
         this.listenChannelStatus()
       } else {
-        this.$Message.error('获取频道歌单失败，请重新进入频道。')
+        this.$Message.error('获取频道歌单失败，请重新进入频道。');
+        this.$ba.trackEvent(`${this.$store2[config.storageType]('userName')}-获取频道歌单失败`, JSON.stringify({
+          info: 'error'
+        }));
         setTimeout(() => {
           this.$router.push(config.addChannelPath);
         }, 800);
@@ -276,8 +279,11 @@ export default {
     /*
     * 切换平台
     * */
-    tabPlatform (num) {
+    tabPlatform (num, name) {
       this.ins = num;
+      this.$ba.trackEvent(`${this.$store2[config.storageType]('userName')}-选择播放平台`, JSON.stringify({
+        info: name
+      }));
     },
     /*
     * 切换歌曲添加方式
@@ -468,6 +474,9 @@ export default {
       const songIndex = getThisPlayer(this.songList, data);
       const thisPlayerInfo = this.songList[songIndex];
       this.$Message.error(`抱歉， ${thisPlayerInfo.title} - ${thisPlayerInfo.artist} 牵涉版权问题暂时无法播放`);
+      this.$ba.trackEvent(`${this.$store2[config.storageType]('userName')}-播放了带有版权的歌曲`, JSON.stringify({
+        info: `${thisPlayerInfo.title} - ${thisPlayerInfo.artist}`
+      }));
       if (parseFloat(songIndex) + 1 === this.songList.length) {
         this.pauseFlag = true;
       }
@@ -592,8 +601,11 @@ export default {
         }
       }, false);
       // 错误处理
-      source.addEventListener('error', () => {
+      source.addEventListener('error', (e) => {
         source.close();
+        this.$ba.trackEvent(`${this.$store2[config.storageType]('userName')}-推送接口连接失败了`, JSON.stringify({
+          info: e
+        }));
         this.listenChannelStatus();
       }, false);
     },

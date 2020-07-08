@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import ba from 'vue-ba';
 import {
   Button,
   Icon,
@@ -49,6 +50,9 @@ Vue.prototype.$Spin = Spin;
 
 Vue.prototype.$api = api;
 Vue.config.productionTip = false;
+
+// 百度统计
+Vue.use(ba, '0a4b12ea522199d435b89105ce2968e8');
 
 /**
  * @description 全局应用配置
