@@ -86,7 +86,7 @@ export default {
           if (info) {
             this.setChannelIdInfo(info);
             this.setFirstEntry(true);
-            this.getUserName();
+            await this.getUserName();
             this.$ba.trackEvent(`${this.$store2[config.storageType]('userName')}-加入频道`, JSON.stringify({
               info
             }));
@@ -106,7 +106,7 @@ export default {
         // 新建频道
         const add = await this.$api.addChannel();
         if (add) {
-          this.getUserName();
+          await this.getUserName();
           this.$ba.trackEvent(`${this.$store2[config.storageType]('userName')}-新建频道`, JSON.stringify({
             info: add
           }));
