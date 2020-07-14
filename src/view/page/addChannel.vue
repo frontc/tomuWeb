@@ -10,31 +10,38 @@
     />
     <div class="bg-player-box">
       <div class="logo"><img src="@/assets/image/logo.png"></div>
-      <div class="description SentyPea">ToMu - 让音乐连接你我</div>
-      <div class="input-channel-id"><Input v-model="channelId" size="large" class="SentyPea" placeholder="请输入频道号" /></div>
+      <div class="description SentyPea">让音乐连接你我</div>
+      <div class="channel-form clearfix">
+        <div class="input-channel-id fl">
+          <Input v-model="channelId" size="large" class="SentyPea" placeholder="请输入频道号" />
+        </div>
+        <div class="fr">
+          <Button
+            type="primary"
+            long
+            size="large"
+            icon="ios-musical-notes"
+            @click="getChannel"
+          ><span class="SentyPea">进入频道</span></Button>
+        </div>
+      </div>
       <div class="channel-id-submit">
         <Row>
           <Col span="12">
-            <Button
-              type="success"
-              long
-              size="large"
-              icon="md-add"
-              @click="addChannel"
-            ><span class="SentyPea">新建频道</span></Button>
+            <a
+              href="javascript:;"
+              style="color: #6ECC6C"
+            >不知道如何开始？</a>
           </Col>
           <Col span="12">
-            <Button
-              type="primary"
-              long
-              size="large"
-              icon="ios-musical-notes"
-              @click="getChannel"
-            ><span class="SentyPea">进入频道</span></Button>
+            <a
+              href="javascript:;"
+              @click="addChannel"
+            >您可以创建一个新频道</a>
           </Col>
         </Row>
       </div>
-      <div class="copy-right SentyPea">Copyright @ 2011-2020 ToMu-{{ versions }} All Rights Reserved.</div>
+      <div class="copy-right SentyPea">Copyright @ 2011-2020 ToMu-<span @mouseover="versionsFlag" v-if="showVersions">{{ apiVersions }}</span><span @mouseout="versionsFlag" v-else>{{ webVersions }}</span> All Rights Reserved.</div>
     </div>
   </div>
 </div>
@@ -51,7 +58,9 @@ export default {
     return {
       channelId: '',
       addClass: '',
-      versions: config.versions
+      showVersions: true,
+      webVersions: config.versions,
+      apiVersions: '',
     }
   },
   components: {
@@ -68,7 +77,23 @@ export default {
     * 初始化系统基本设置
     * */
     initSystemInfo () {
+      this.getVersion();
       this.resetSystemInfo();
+    },
+    /*
+    * 查看版权
+    * */
+    async getVersion() {
+      const version = await this.$api.getVersion();
+      if (version) {
+        this.apiVersions = version
+      }
+    },
+    /*
+    * 显示版权
+    * */
+    versionsFlag () {
+      this.showVersions = !this.showVersions
     },
     /*
     * 进入频道
@@ -173,12 +198,12 @@ export default {
     }
     .bg-player-box{
       position: absolute;
-      left: -50px;
-      top: 100px;
+      left: 50px;
+      top: 120px;
       z-index: 3;
       background: rgba(255,255,255,0.75);
-      width: 700px;
-      height: 400px;
+      width: 500px;
+      height: 350px;
       border-radius: 30px;
       .logo{
         text-align: center;
@@ -189,13 +214,20 @@ export default {
         text-align: center;
         padding-bottom: 30px;
       }
-      .input-channel-id{
+      .channel-form{
         padding: 10px 30px 20px 30px;
+        .input-channel-id{
+          width: 300px;
+        }
+        .fr{
+          width: 130px;
+        }
       }
       .channel-id-submit{
-        padding: 0px 100px 30px 100px;
+        padding: 0px 30px 30px 30px;
         .ivu-col{
           padding: 0 15px;
+          text-align: center;
         }
       }
       .copy-right{
@@ -212,6 +244,19 @@ export default {
         top: 0;
         height: auto;
         position: relative;
+        .channel-form{
+          .input-channel-id{
+            width: 100%;
+            margin-bottom: 10px;
+            float: none;
+            display: block;
+          }
+          .fr{
+            width: 100%;
+            float: none;
+            display: block;
+          }
+        }
         .channel-id-submit{
           padding: 0 30px 10px 30px;
         }

@@ -195,7 +195,7 @@ export const getThisPlayer = (list, player) => {
  */
 export const changeResultData = (data) => {
   let dataList = []
-  if (data.length === 0) return data
+  if (data.length === 0) return data;
   Object.keys(data).forEach(i => {
     let dataObj = {};
     dataObj.id = data[i].songID;
@@ -207,7 +207,7 @@ export const changeResultData = (data) => {
     dataObj.lrc = data[i].lrcUrl;
     dataObj.url = data[i].mp3Url;
     dataList.push(dataObj)
-  })
+  });
   return dataList;
 };
 
@@ -216,7 +216,7 @@ export const changeResultData = (data) => {
  */
 export const changeRequestData = (data) => {
   let dataList = []
-  if (data.length === 0) return data
+  if (data.length === 0) return data;
   Object.keys(data).forEach(i => {
     let dataObj = {};
     dataObj.songSource = data[i].songSource;
@@ -228,7 +228,7 @@ export const changeRequestData = (data) => {
     dataObj.lrcUrl = data[i].lrc;
     dataObj.mp3Url = data[i].url;
     dataList.push(dataObj)
-  })
+  });
   return dataList;
 };
 

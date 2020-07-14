@@ -32,4 +32,12 @@ export default {
       height: 100%;
     }
   }
+  .ivu-modal-footer{
+    display: none;
+  }
+  .user{
+    .fl{
+      width: 50%;
+    }
+  }
 </style>

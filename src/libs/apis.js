@@ -27,6 +27,10 @@ export default {
       baseURL: config.songListApi
     });
   },
+  // 查询Server版本
+  getVersion () {
+    return axios.get(`${config.apiVersions}/version`);
+  },
   // 获取token
   getAuthKey () {
     return axios.get(`${config.apiVersions}/auth`);

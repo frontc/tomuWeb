@@ -98,7 +98,7 @@
           <Icon
             type="ios-radio"
             size="30"
-          /><span class="SentyPea">当前频道: channel-{{ channelIdInfo.channelID || '获取中' }}</span>
+          /><span class="SentyPea">频道# {{ channelIdInfo.channelID || '获取中' }}</span>
         </div>
         <div class="fr clearfix SentyPea">
           <ul>
@@ -210,6 +210,11 @@ export default {
   },
   components: {
     tomuAplayer,
+  },
+  watch: {
+    thisPlayerInfo (data) {
+      document.title = `ToMu - ${data.title}`
+    }
   },
   computed: {
     ...mapState([
@@ -485,8 +490,12 @@ export default {
     * 显示关闭歌词
     * */
     lrcShowFlag () {
-      this.lrcFlag = !this.lrcFlag;
-      this.$refs.aplayer.lrcFlag();
+      if (this.songList.length > 0) {
+        this.lrcFlag = !this.lrcFlag;
+        this.$refs.aplayer.lrcFlag();
+      } else {
+        this.$Message.info('请添加歌曲');
+      }
     },
     /*
     * 显示关闭歌单

@@ -5,6 +5,14 @@
     <div class="fr SentyPea">
       <ul>
         <li v-if="!newChannelFlag">
+          <a href="javascript:;" @click="seeUser">
+            <Icon
+              type="ios-man"
+              size="16"
+            />谁在听
+          </a>
+        </li>
+        <li v-if="!newChannelFlag">
           <a href="javascript:;" @click="addFavorite">
             <Icon
               type="md-heart"
@@ -52,6 +60,26 @@
         long>复制频道链接</Button>
     </div>
   </div>
+  <div class="userList" v-if="userListBox">
+    <Modal v-model="userListFlag" width="360">
+      <p slot="header" style="color:#f60;text-align:center">
+        <span class="SentyPea">谁在听</span>
+      </p>
+      <div style="text-align:center">
+        <div class="clearfix user SentyPea">
+          <div class="fl">我</div>
+          <div class="fl">
+            <span style="color: #0078D7">他（她）</span>
+            <Icon
+              type="md-close"
+              @click="removeUser"
+            />
+          </div>
+        </div>
+      </div>
+      <div slot="footer"></div>
+    </Modal>
+  </div>
 </div>
 </template>
 
@@ -69,7 +97,10 @@ export default {
   data () {
     return {
       inviteFlag: false,
-      url: ''
+      url: '',
+      closeFlag: false,
+      userListBox: false,
+      userListFlag: false
     }
   },
   props: {
@@ -135,6 +166,27 @@ export default {
     * */
     closeInvite () {
       this.inviteFlag = !this.inviteFlag;
+    },
+    /*
+    * 查看在线人员
+    * */
+    async seeUser () {
+      const userList = await this.$api.getAudienceList(this.channelIdInfo.channelID);
+      const userInfo = await this.$api.getThisUserName(this.channelIdInfo.channelID);
+      if (userList.length === 1 && userList[0] === userInfo) {
+        this.$Message.info('只有我在');
+      } else {
+        this.userListBox = true;
+        this.userListFlag = true;
+      }
+    },
+    removeUser () {
+      this.$Modal.info({
+        title: '确定移除吗？',
+        onOk: () => {
+          this.$Message.info('移除成功')
+        }
+      })
     },
     /*
     * 复制

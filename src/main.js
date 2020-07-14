@@ -14,6 +14,7 @@ import {
   RadioGroup,
   Radio,
   Checkbox,
+  Modal,
 } from 'view-design';
 import store2 from 'store2'
 // APlayer
@@ -44,9 +45,11 @@ Vue.component('DropdownItem', DropdownItem);
 Vue.component('RadioGroup', RadioGroup);
 Vue.component('Radio', Radio);
 Vue.component('Checkbox', Checkbox);
+Vue.component('Modal', Modal);
 
 Vue.prototype.$Message = Message;
 Vue.prototype.$Spin = Spin;
+Vue.prototype.$Modal = Modal;
 
 Vue.prototype.$api = api;
 Vue.config.productionTip = false;
