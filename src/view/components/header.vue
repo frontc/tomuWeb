@@ -100,7 +100,8 @@ export default {
       url: '',
       closeFlag: false,
       userListBox: false,
-      userListFlag: false
+      userListFlag: false,
+      otherUser: ''
     }
   },
   props: {
@@ -176,6 +177,11 @@ export default {
       if (userList.length === 1 && userList[0] === userInfo) {
         this.$Message.info('只有我在');
       } else {
+        Object.keys(userList).forEach(i => {
+          if (userList[i] !== userInfo) {
+            this.otherUser = userList[i]
+          }
+        });
         this.userListBox = true;
         this.userListFlag = true;
       }
@@ -184,7 +190,13 @@ export default {
       this.$Modal.info({
         title: '确定移除吗？',
         onOk: () => {
-          this.$Message.info('移除成功')
+          this.$api.deleteUser(this.channelIdInfo.channelID, this.otherUser).then((d) => {
+            if (d) {
+              this.userListBox = false;
+              this.userListFlag = false;
+              this.$Message.info('移除成功')
+            }
+          })
         }
       })
     },

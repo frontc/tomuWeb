@@ -1,6 +1,6 @@
 <template>
 <div class="footer SentyPea">
-  Copyright @ 2011-2020 ToMu- {{ versions }} All Rights Reserved.
+  Copyright @ 2011-2020 ToMu- <span @mouseover="versionsFlag" v-if="showVersions">{{ apiVersions }}</span><span @mouseout="versionsFlag" v-else>{{ webVersions }}</span> All Rights Reserved.
 </div>
 </template>
 
@@ -11,8 +11,30 @@ export default {
   name: 'pageFooter',
   data () {
     return {
-      versions: config.versions
+      showVersions: true,
+      webVersions: config.versions,
+      apiVersions: ''
     }
+  },
+  methods: {
+    /*
+    * 查看版权
+    * */
+    async getVersion() {
+      const version = await this.$api.getVersion();
+      if (version) {
+        this.apiVersions = version
+      }
+    },
+    /*
+    * 显示版权
+    * */
+    versionsFlag () {
+      this.showVersions = !this.showVersions
+    }
+  },
+  mounted() {
+    this.getVersion();
   }
 }
 </script>

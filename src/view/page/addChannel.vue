@@ -4,42 +4,34 @@
     class="handle-box animate__animated animate__zoomInUp_center"
     :class="addClass"
   >
-    <waves
-      class="waves-block"
-      color="rgba(25,190,107,0.75)"
-    />
     <div class="bg-player-box">
       <div class="logo"><img src="@/assets/image/logo.png"></div>
-      <div class="description SentyPea">让音乐连接你我</div>
-      <div class="channel-form clearfix">
-        <div class="input-channel-id fl">
-          <Input v-model="channelId" size="large" class="SentyPea" placeholder="请输入频道号" />
-        </div>
-        <div class="fr">
-          <Button
-            type="primary"
-            long
-            size="large"
-            icon="ios-musical-notes"
-            @click="getChannel"
-          ><span class="SentyPea">进入频道</span></Button>
+      <div class="channel-form">
+        <div class="clearfix form">
+          <div class="input-channel-id fl">
+            <input v-model="channelId" class="SentyPea" placeholder="请输入频道号" />
+          </div>
+          <div class="fr">
+            <button
+              @click="getChannel"
+            >进入</button>
+          </div>
         </div>
       </div>
       <div class="channel-id-submit">
-        <Row>
-          <Col span="12">
+        <div class="clearfix">
+          <div class="fl">
             <a
               href="javascript:;"
-              style="color: #6ECC6C"
             >不知道如何开始？</a>
-          </Col>
-          <Col span="12">
+          </div>
+          <div class="fr">
             <a
               href="javascript:;"
               @click="addChannel"
             >您可以创建一个新频道</a>
-          </Col>
-        </Row>
+          </div>
+        </div>
       </div>
       <div class="copy-right SentyPea">Copyright @ 2011-2020 ToMu-<span @mouseover="versionsFlag" v-if="showVersions">{{ apiVersions }}</span><span @mouseout="versionsFlag" v-else>{{ webVersions }}</span> All Rights Reserved.</div>
     </div>
@@ -49,7 +41,6 @@
 
 <script>
 import config from '@/config';
-import waves from '@/components/waves.vue';
 import { mapMutations } from 'vuex';
 
 export default {
@@ -62,9 +53,6 @@ export default {
       webVersions: config.versions,
       apiVersions: '',
     }
-  },
-  components: {
-    waves
   },
   methods: {
     ...mapMutations([
@@ -180,93 +168,125 @@ export default {
 <style scoped lang="less">
 .main{
   background-size: cover;
-  align-items:center;
-  justify-content:center;
-  display:-webkit-flex;
   .handle-box{
-    width: 600px;
-    height: 600px;
+    width: 100%;
+    height: 100%;
     position: relative;
-    .waves-block {
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      left: 0;
-      top: 0;
-      z-index: 2;
-      .waves {background: rgba(25,190,107,0.75) !important;}
-    }
     .bg-player-box{
       position: absolute;
-      left: 50px;
-      top: 120px;
+      left: 50%;
+      top: 10%;
       z-index: 3;
-      background: rgba(255,255,255,0.75);
-      width: 500px;
-      height: 350px;
-      border-radius: 30px;
+      margin-left: -295px;
+      width: 590px;
       .logo{
         text-align: center;
-        padding: 30px 0 10px 0;
-        img{height:80px;}
       }
       .description{
         text-align: center;
         padding-bottom: 30px;
       }
       .channel-form{
-        padding: 10px 30px 20px 30px;
-        .input-channel-id{
-          width: 300px;
-        }
-        .fr{
-          width: 130px;
+        padding: 65px 0px 22px 0px;
+        .form{
+          width: 590px;
+          height: 70px;
+          .input-channel-id{
+            width: 495px;
+            height: 67px;
+            float: left;
+            input{
+              background: #8F92FA;
+              color: #D5D6FD;
+              height: 67px;
+              width: 100%;
+              outline: none;
+              font-size: 20px;
+              text-indent: 25px;
+              border-top-left-radius: 10px;
+              border-bottom-left-radius: 10px;
+              border: 2px solid #8D48F3;
+            }
+            input::-webkit-input-placeholder{
+              color: #D5D6FD;
+            }
+            input::-moz-placeholder{
+              color: #D5D6FD;
+            }
+            input:-moz-placeholder{
+              color: #D5D6FD;
+            }
+            input:-ms-input-placeholder{
+              color: #D5D6FD;
+            }
+          }
+          .fr{
+            width: 95px;
+            button{
+              width: 95px;
+              height: 67px;
+              background: #8D48F3;
+              border: none;
+              font-size: 20px;
+              color: #ffffff;
+              border-top-right-radius: 7px;
+              border-bottom-right-radius: 7px;
+              outline: none;
+            }
+          }
         }
       }
       .channel-id-submit{
-        padding: 0px 30px 30px 30px;
-        .ivu-col{
-          padding: 0 15px;
-          text-align: center;
+        width: 530px;
+        margin: 0 auto;
+        padding-top: 20px;
+        a{
+          color: #ffffff;
         }
       }
       .copy-right{
         text-align: center;
-        position: absolute;
+        position: fixed;
         left: 0;
         bottom: 20px;
         width: 100%;
-        color: #999999;
+        font-size: 13px;
+        color: #B9BAC6;
       }
       @media only screen and (max-width: 700px) and (min-width:0px) {
         width: 90%;
-        left: 0%;
-        top: 0;
+        left: 5%;
         height: auto;
         position: relative;
+        margin-left: 0;
         .channel-form{
-          .input-channel-id{
+          padding: 30px 0 15px 0;
+          .form{
             width: 100%;
-            margin-bottom: 10px;
-            float: none;
-            display: block;
-          }
-          .fr{
-            width: 100%;
-            float: none;
-            display: block;
+            height: 55px;
+            .input-channel-id{
+              width: 70%;
+              height: 52px;
+              input{
+                height: 52px;
+                font-size: 16px;
+              }
+            }
+            .fr{
+              width: 30%;
+              height: 52px;
+              button{
+                font-size: 16px;
+                height: 52px;
+              }
+            }
           }
         }
         .channel-id-submit{
-          padding: 0 30px 10px 30px;
-        }
-        .ivu-col{
-          padding: 0 5px !important;
+          width: 100%;
+          padding: 0;
         }
         .copy-right{
-          position: relative;
-          left: 0;
-          bottom: 0;
           padding: 8px;
         }
       }
@@ -276,20 +296,6 @@ export default {
           width: 100% !important;
         }
       }
-    }
-    @media only screen and (max-width: 700px) and (min-width:0px) {
-      .waves-block{
-        display: none;
-      }
-    }
-  }
-  @media only screen and (max-width: 700px) and (min-width:0px) {
-    .handle-box{
-      width: 100%;
-      height: 100%;
-      align-items:center;
-      justify-content:center;
-      display:-webkit-flex;
     }
   }
 }

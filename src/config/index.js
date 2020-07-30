@@ -13,7 +13,7 @@ export default {
   /**
    * @description 网站发布版本
    */
-  versions: '0.0.12',
+  versions: '0.0.13',
   /**
    * @description 首页入口名称
    */

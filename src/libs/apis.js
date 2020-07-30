@@ -75,6 +75,10 @@ export default {
   signOutChannel (channelID) {
     return axios.delete(`${config.apiVersions}/channel/${channelID}/audience`, AuthorizationToken());
   },
+  // 踢走频道内的指定用户
+  deleteUser (channelID, name) {
+    return axios.delete(`${config.apiVersions}/channel/${channelID}/audience/${name}`, AuthorizationToken());
+  },
   // 验证歌曲api
   copyRightApi (url) {
     return axios.get(url);
