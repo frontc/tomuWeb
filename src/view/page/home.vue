@@ -948,6 +948,7 @@ export default {
             .aplayer-pic{
               width: 150px;
               height: 150px;
+              border: 6px solid #ffffff;
               .aplayer-play{
                 width: 36px;
                 height: 36px;
@@ -974,8 +975,8 @@ export default {
             }
             .aplayer-info{
               border: none;
-              margin-left: 150px;
-              height: 150px;
+              margin-left: 170px;
+              height: 162px;
               .aplayer-music{
                 height: auto;
                 padding-top: 25px;
