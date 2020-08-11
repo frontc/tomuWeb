@@ -323,7 +323,8 @@ export default {
       'setSongList',
       'setChannelFlag',
       'setAddFlag',
-      'setLastSongs'
+      'setLastSongs',
+      'setSignOut'
     ]),
     async getChannelSongs () {
       // 清空搜索歌单列表
