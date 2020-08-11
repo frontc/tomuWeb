@@ -8,13 +8,11 @@ import {
   Col,
   Message,
   Spin,
-  Dropdown,
-  DropdownMenu,
-  DropdownItem,
   RadioGroup,
   Radio,
   Checkbox,
   Modal,
+  Scroll
 } from 'view-design';
 import store2 from 'store2'
 // APlayer
@@ -39,13 +37,11 @@ Vue.component('Icon', Icon);
 Vue.component('Input', Input);
 Vue.component('Row', Row);
 Vue.component('Col', Col);
-Vue.component('Dropdown', Dropdown);
-Vue.component('DropdownMenu', DropdownMenu);
-Vue.component('DropdownItem', DropdownItem);
 Vue.component('RadioGroup', RadioGroup);
 Vue.component('Radio', Radio);
 Vue.component('Checkbox', Checkbox);
 Vue.component('Modal', Modal);
+Vue.component('Scroll', Scroll);
 
 Vue.prototype.$Message = Message;
 Vue.prototype.$Spin = Spin;

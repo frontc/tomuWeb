@@ -61,7 +61,7 @@ export default {
   },
   // 上报播放状态变化
   setChannelSongsStatus (channelID, data) {
-    return axios.post(`${config.apiVersions}/channel/${channelID}/status`, qs.stringify(data), AuthorizationToken());
+    return axios.post(`${config.apiVersions}/channel/${channelID}/event/playStatusChange`, qs.stringify(data), AuthorizationToken());
   },
   // 获取频道在线用户
   getAudienceList (channelID) {
@@ -82,5 +82,13 @@ export default {
   // 验证歌曲api
   copyRightApi (url) {
     return axios.get(url);
+  },
+  // 获取播放历史
+  getPlayHistory (channelID, page, size) {
+    return axios.get(`${config.apiVersions}/channel/${channelID}/playHistory?pageNum=${page}&pageSize=${size}`, AuthorizationToken());
+  },
+  // 获取播放历史汇总
+  getPlayHistorySummary (channelID) {
+    return axios.get(`${config.apiVersions}/channel/${channelID}/playHistory/summary`, AuthorizationToken());
   }
 };

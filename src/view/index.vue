@@ -10,10 +10,9 @@
         :newChannelFlag="newChannel"
       >
       </page-header>
-      <div class="home-content" :style="newChannel ? 'z-index:9999' : ''">
+      <div class="home-content">
         <router-view/>
       </div>
-      <page-footer/>
     </div>
   </div>
 </div>
@@ -21,7 +20,6 @@
 
 <script>
 import pageHeader from '@/view/components/header.vue';
-import pageFooter from '@/view/components/footer.vue';
 import { mapState } from 'vuex';
 
 export default {
@@ -32,8 +30,7 @@ export default {
     }
   },
   components: {
-    pageHeader,
-    pageFooter
+    pageHeader
   },
   computed: {
     ...mapState([
@@ -59,14 +56,9 @@ export default {
   .home{
     width: 100%;
     height: 100%;
-    background: rgba(255, 255, 255, 0.8);
     .home-content{
-      position: fixed;
-      left: 0;
-      top: 65px;
-      bottom: 40px;
       width: 100%;
-      z-index: 3;
+      height: 100%;
     }
   }
 </style>

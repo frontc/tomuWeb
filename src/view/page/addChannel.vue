@@ -9,7 +9,7 @@
       <div class="channel-form">
         <div class="clearfix form">
           <div class="input-channel-id fl">
-            <input v-model="channelId" class="SentyPea" placeholder="请输入频道号" />
+            <input v-model="channelId" placeholder="请输入频道号" />
           </div>
           <div class="fr">
             <button
@@ -33,7 +33,7 @@
           </div>
         </div>
       </div>
-      <div class="copy-right SentyPea">Copyright @ 2011-2020 ToMu-<span @mouseover="versionsFlag" v-if="showVersions">{{ apiVersions }}</span><span @mouseout="versionsFlag" v-else>{{ webVersions }}</span> All Rights Reserved.</div>
+      <div class="copy-right">Copyright @ 2011-2020 ToMu-<span @mouseover="versionsFlag" v-if="showVersions">{{ apiVersions }}</span><span @mouseout="versionsFlag" v-else>{{ webVersions }}</span> All Rights Reserved.</div>
     </div>
   </div>
 </div>
@@ -52,14 +52,18 @@ export default {
       showVersions: true,
       webVersions: config.versions,
       apiVersions: '',
+      auth: ''
     }
   },
   methods: {
     ...mapMutations([
       'resetSystemInfo',
       'setNewChannel',
+      'setSongList',
       'setChannelIdInfo',
-      'setFirstEntry'
+      'setFirstEntry',
+      'lastChannelInfo',
+      'setLastSongs'
     ]),
     /*
     * 初始化系统基本设置
@@ -90,21 +94,30 @@ export default {
       if (this.channelId === '') {
         this.$Message.info('请输入频道ID');
       } else {
-        // 获取令牌
-        const auth = await this.$api.getAuthKey();
-        if (auth) {
-          this.$store2[config.storageType](config.tokenName, auth);
-          // 新建频道
-          const info = await this.$api.getChannelInfo(this.channelId);
-          if (info) {
-            this.setChannelIdInfo(info);
-            this.setFirstEntry(true);
-            await this.getUserName();
-            this.$ba.trackEvent(`${this.$store2[config.storageType]('userName')}-加入频道`, JSON.stringify({
-              info
-            }));
-            this.goToHome();
+        if (this.auth === '') {
+          // 获取令牌
+          const auth = await this.$api.getAuthKey();
+          if (auth) {
+            this.$store2[config.storageType](config.tokenName, auth);
           }
+        }
+        // 进入频道
+        const info = await this.$api.getChannelInfo(this.channelId);
+        if (info) {
+          this.setLastSongs(info.playlist);
+          this.setChannelIdInfo(this.channelId);
+          this.lastChannelInfo({
+            channelCreateDate: info.channelCreateDate,
+            channelName: info.channelName,
+            lastPlayDate: info.lastPlayDate,
+            lastPosition: info.lastPosition,
+            lastSongID: info.lastSongID
+          });
+          await this.getUserName();
+          this.$ba.trackEvent(`${this.$store2[config.storageType]('userName')}-加入频道`, JSON.stringify({
+            info
+          }));
+          this.goToHome();
         }
       }
     },
@@ -116,6 +129,7 @@ export default {
       const auth = await this.$api.getAuthKey();
       if (auth) {
         this.$store2[config.storageType](config.tokenName, auth);
+        this.auth = auth;
         // 新建频道
         const add = await this.$api.addChannel();
         if (add) {
@@ -123,9 +137,10 @@ export default {
           this.$ba.trackEvent(`${this.$store2[config.storageType]('userName')}-新建频道`, JSON.stringify({
             info: add
           }));
+          this.channelId = add;
           this.setChannelIdInfo(add);
           this.setNewChannel();
-          this.goToHome();
+          this.getChannel();
         }
       }
     },
@@ -149,6 +164,7 @@ export default {
       // 获取频道ID
       this.channelId = router.params.id || '';
       if (this.channelId !== '') {
+        this.setFirstEntry(true);
         this.getChannel()
       }
     }
@@ -168,6 +184,7 @@ export default {
 <style scoped lang="less">
 .main{
   background-size: cover;
+  background: url("~@/assets/image/bg.jpg") center no-repeat;
   .handle-box{
     width: 100%;
     height: 100%;

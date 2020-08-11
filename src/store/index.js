@@ -12,7 +12,9 @@ export default new Vuex.Store({
     songList: [], // 歌曲列表
     addFlag: false,
     channelIdInfo: null,
-    firstEntry: false
+    firstEntry: false,
+    lastSongs: [], // 最后一次播放歌曲
+    lastChannelInfo: {} // 最后一次播放信息
   },
   mutations: {
     /*
@@ -69,6 +71,18 @@ export default new Vuex.Store({
     * */
     setFirstEntry (state, info) {
       state.firstEntry = info;
+    },
+    /*
+    * 设置最后一次播放信息
+    * */
+    lastChannelInfo (state, info) {
+      state.lastChannelInfo = info;
+    },
+    /*
+    * 设置最后一次播放歌曲
+    * */
+    setLastSongs (state, info) {
+      state.lastSongs = info;
     }
   },
   plugins: [createPersistedState({

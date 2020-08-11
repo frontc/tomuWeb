@@ -122,7 +122,7 @@ export default {
     * */
     loop: {
       default() {
-        return 'all';
+        return 'none';
       },
       type: String
     },
@@ -172,7 +172,7 @@ export default {
     * */
     lrcType: {
       default() {
-        return 3;
+        return 0;
       },
       type: Number
     },
@@ -255,7 +255,20 @@ export default {
     * */
     playList: {
       default() {
-        return [];
+        return [{
+          id: 0,
+          artist: 'ToMu',
+          author: 'ToMu',
+          cover: 'https://ooorq.com/image/tomu-logo.png',
+          lrc: '',
+          name: '欢迎使用ToMu,请添加歌曲',
+          pic: 'https://ooorq.com/image/tomu-logo.png',
+          songSource: 'netease',
+          songUrl: 'https://ooorq.com/mp3/tomu.mp3',
+          title: '欢迎使用ToMu,请添加歌曲',
+          type: 'normal',
+          url: 'https://ooorq.com/mp3/tomu.mp3'
+        }];
       },
       type: Array
     },
@@ -352,6 +365,21 @@ export default {
       }
       if (options.playList.length > 0) {
         this.loadPlayer(options.playList);
+      } else {
+        this.loadPlayer([{
+          id: 0,
+          artist: 'ToMu',
+          author: 'ToMu',
+          cover: 'https://ooorq.com/image/tomu-logo.png',
+          lrc: '',
+          name: '欢迎使用ToMu,请添加歌曲',
+          pic: 'https://ooorq.com/image/tomu-logo.png',
+          songSource: 'netease',
+          songUrl: 'https://ooorq.com/mp3/tomu.mp3',
+          title: '欢迎使用ToMu,请添加歌曲',
+          type: 'normal',
+          url: 'https://ooorq.com/mp3/tomu.mp3'
+        }]);
       }
     },
     /*

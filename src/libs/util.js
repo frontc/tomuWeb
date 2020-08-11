@@ -107,12 +107,14 @@ export const addSongData = (data, addData, type) => {
   const songData = store2[config.storageType]('addSongData');
   if (songData.length === 0) {
     return addArrayAttr(addData, {
-      songSource: type
+      songSource: type,
+      flag: false
     });
   }
   if (songData.length > 0) {
     let dataList = removeArrayAttr({
-      songSource: type
+      songSource: type,
+      flag: false
     });
     Object.keys(addData).forEach((i) => {
       let hasData = dataList.find(item => (JSON.stringify(item) === JSON.stringify(addData[i])));
@@ -122,7 +124,8 @@ export const addSongData = (data, addData, type) => {
     });
   }
   return addArrayAttr(songData, {
-    songSource: type
+    songSource: type,
+    flag: false
   });
 };
 
@@ -181,7 +184,7 @@ export const addCdImage = (el) => {
  * @description 获取当前正在播放的歌曲index
  */
 export const getThisPlayer = (list, player) => {
-  let index = 0;
+  let index = -1;
   Object.keys(list).forEach(i => {
     if (list[i].url === player.path[0].currentSrc) {
       index = i;
@@ -221,7 +224,6 @@ export const changeRequestData = (data) => {
     let dataObj = {};
     dataObj.songSource = data[i].songSource;
     dataObj.songUrl = data[i].songUrl || 'https://music.163.com/#/';
-    dataObj.songDuration = '120';
     dataObj.songName = data[i].title;
     dataObj.artistName = data[i].author;
     dataObj.coverUrl = data[i].pic;

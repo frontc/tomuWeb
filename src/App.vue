@@ -27,7 +27,7 @@ export default {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: #333;
-    background: url("~@/assets/image/bg.jpg") center no-repeat;
+    background: url("~@/assets/image/home_bg.jpg") center no-repeat;
     >div{
       height: 100%;
     }

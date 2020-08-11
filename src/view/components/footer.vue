@@ -1,5 +1,5 @@
 <template>
-<div class="footer SentyPea">
+<div class="footer">
   Copyright @ 2011-2020 ToMu- <span @mouseover="versionsFlag" v-if="showVersions">{{ apiVersions }}</span><span @mouseout="versionsFlag" v-else>{{ webVersions }}</span> All Rights Reserved.
 </div>
 </template>
@@ -43,15 +43,11 @@ export default {
   .footer{
     width: 100%;
     text-align: center;
-    color: #999999;
-    border-top: 1px solid #d8d8d8;
-    height: 40px;
-    line-height: 40px;
-    position: fixed;
-    left: 0;
-    bottom: 0;
+    color: #6a6ca6;
+    height: 60px;
+    line-height: 60px;
     width: 100%;
-    z-index: 1;
+    background: #babafd;
   }
   @media only screen and (max-width: 700px) and (min-width:0px) {
     .footer{
