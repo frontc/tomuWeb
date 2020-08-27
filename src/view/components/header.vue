@@ -1,7 +1,7 @@
 <template>
 <div class="header">
   <div class="clearfix header-main">
-    <div class="logo fl"><img src="@/assets/image/logo.png"/></div>
+    <div class="logo fl"><img src="@/assets/image/logo.svg"/></div>
     <div class="fr clearfix">
       <ul>
         <!-- <li>

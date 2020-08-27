@@ -5,7 +5,7 @@
     :class="addClass"
   >
     <div class="bg-player-box">
-      <div class="logo"><img src="@/assets/image/logo.png"></div>
+      <div class="logo"><img src="@/assets/image/logo.svg"></div>
       <div class="channel-form">
         <div class="clearfix form">
           <div class="input-channel-id fl">
