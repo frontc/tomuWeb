@@ -11,7 +11,7 @@
   "dependencies": {
     "animate.css": "^4.1.0",
     "aplayer": "^1.10.1",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "core-js": "^3.6.4",
     "event-source-polyfill": "^1.0.15",
     "qrcodejs2": "^0.0.2",
